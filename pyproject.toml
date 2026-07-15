@@ -7,8 +7,6 @@ dependencies = [
     "discord.py>=2.4",
     "SQLAlchemy[asyncio]>=2.0",
     "aiosqlite>=0.20",
-    "asyncpg>=0.29",
-    "psycopg[binary]>=3.1",
     "alembic>=1.13",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
@@ -22,6 +20,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Only needed if DATABASE_URL points at Postgres instead of the SQLite default.
+postgres = ["asyncpg>=0.29", "psycopg[binary]>=3.1"]
 playwright = ["playwright>=1.44"]
 llm = ["anthropic>=0.34"]
 dev = [

@@ -17,7 +17,8 @@ COPY migrations ./migrations
 COPY alembic.ini ./
 COPY docker/entrypoint.sh ./docker/entrypoint.sh
 
-RUN pip install --upgrade pip && pip install .
+# The compose stack uses Postgres, so install the postgres extra.
+RUN pip install --upgrade pip && pip install ".[postgres]"
 
 # Non-root user
 RUN useradd --create-home --uid 10001 appuser && chown -R appuser /app
