@@ -1,0 +1,91 @@
+{
+  "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
+  "schema_version": "1.0",
+  "last_updated": "2026-07-14",
+  "project": {
+    "name": "jobbot",
+    "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
+    "repo": "https://github.com/YheChen/Job-Bot",
+    "default_branch": "master",
+    "language": "Python 3.12+",
+    "layout": "src/ layout; package at src/jobbot",
+    "local_path": "/Users/yanzhenchen/Desktop/GitHub Projects/Job Bot"
+  },
+  "deployment": {
+    "target": "Single always-on Linux VM (planned: Oracle Cloud free-tier Ampere ARM; fallback: Raspberry Pi). No Docker needed.",
+    "database": "SQLite by default (local file, zero external services). Postgres supported by switching DATABASE_URL; only Postgres-specific feature is the cross-process scan advisory lock.",
+    "sqlite_path_note": "Use an ABSOLUTE path in DATABASE_URL, e.g. sqlite+aiosqlite:////opt/jobbot/jobbot.db (four slashes).",
+    "process_manager": "systemd unit at deploy/jobbot.service (runs as 'jobbot' user under /opt/jobbot).",
+    "oracle_cloud_gotcha": "Bot only makes OUTBOUND connections; no inbound VCN/iptables rules needed. /health binds locally.",
+    "docker_status": "Docker + Postgres path still fully supported (docker-compose.yml). Dockerfile installs the .[postgres] extra."
+  },
+  "key_decisions": [
+    "Deterministic-first: query gen, URL canonicalization, dedup, and relevance scoring are pure/tested functions. LLM classification is opt-in (ENABLE_LLM_CLASSIFICATION) and only refines an already-passing result.",
+    "Protocol-based extension points: SearchProvider and PlatformAdapter are drop-in. PlatformRegistry maps hostnames to adapters.",
+    "Bounded query generation (no Cartesian explosion): templates per (platform, title-group), decorated with term/location clauses; select_batch reserves top-priority queries and rotates a window over the rest.",
+    "Job identity via dedup_key: platform+requisition-id -> canonical URL -> normalized company+title. Re-discovery updates last_seen; job_versions snapshot only on material content change; Discord posting gated on posted_to_discord.",
+    "SQLite chosen over Postgres for single-instance simplicity; advisory lock is dialect-aware (real pg lock on Postgres, no-op on SQLite where the scheduler's asyncio lock serializes scans).",
+    "Postgres drivers (asyncpg/psycopg) moved to optional [postgres] extra so base install is ARM-friendly with no compiled deps."
+  ],
+  "current_state": {
+    "latest_commit": "455ed27",
+    "branch": "master (clean)",
+    "tests": "64 passing (pytest); pure logic, no DB/network required",
+    "db_schema": "15 tables, created via alembic upgrade head (migrations/versions/0001_initial.py uses metadata.create_all)",
+    "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
+    "merged_prs": [
+      "#1 Run without Docker: SQLite default + Linux VM deployment",
+      "#2 Add CI workflow (ruff + pytest + migration smoke) and fix lint",
+      "#3 Add pre-commit hooks + enforce formatting in CI"
+    ]
+  },
+  "conventions": {
+    "ci": ".github/workflows/ci.yml runs on push/PR to master: ruff check, ruff format --check, pytest, and a SQLite alembic upgrade head smoke test.",
+    "pre_commit": ".pre-commit-config.yaml (ruff lint+format + hygiene hooks). Enable with 'make hooks' after 'make install'. Pinned: ruff v0.15.21, pre-commit-hooks v6.0.0.",
+    "workflow": "Work on a branch, open a PR, wait for CI green, squash-merge, delete branch. Never commit directly to master.",
+    "commit_trailer": "Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>",
+    "secrets": "Never commit .env. Config is validated by Pydantic (src/jobbot/config.py) and fails fast."
+  },
+  "quick_reference": {
+    "setup": "make install && make hooks",
+    "migrate": "make migrate  (alembic upgrade head)",
+    "run": "make run  (or: jobbot / python -m jobbot.main)",
+    "test": "make test  (pytest -q)",
+    "keyless_dry_run": "set SEARCH_PROVIDERS=mock in .env to exercise the pipeline with no API key",
+    "required_env": ["DISCORD_TOKEN", "one search provider key (or SEARCH_PROVIDERS=mock)"],
+    "health_endpoint": "http://localhost:8080/health (and /ready for DB connectivity)"
+  },
+  "architecture_pointers": {
+    "entrypoint": "src/jobbot/main.py",
+    "config": "src/jobbot/config.py",
+    "scan_orchestrator": "src/jobbot/services/scan_service.py",
+    "scheduler": "src/jobbot/scheduler/runner.py",
+    "search_providers": "src/jobbot/search/ (base.py protocol, manager.py fallback)",
+    "query_generation": "src/jobbot/queries/ (terms.py vocab, generator.py)",
+    "platform_adapters": "src/jobbot/platforms/ (base.py, registry.py, per-ATS)",
+    "parsing": "src/jobbot/parsing/ (url canon, ssrf guard, jsonld, fetcher, extractor)",
+    "scoring": "src/jobbot/scoring/relevance.py",
+    "dedup": "src/jobbot/dedup/detector.py",
+    "expiration": "src/jobbot/expiration/checker.py",
+    "discord": "src/jobbot/bot/ (client, embeds, views, permissions, cogs/jobs.py)",
+    "models": "src/jobbot/db/models.py"
+  },
+  "feature_flags_and_roadmap": {
+    "enabled_now": "search -> extract -> dedup -> filter -> relevance -> expiration -> Discord embeds + buttons; all slash commands; per-guild scheduling.",
+    "off_by_default": [
+      "LLM classification (ENABLE_LLM_CLASSIFICATION) - Anthropic refinement step",
+      "Playwright rendering for JS-only job pages (install [playwright] extra) - relevant for Workday/Oracle/SuccessFactors which are often JS-rendered"
+    ],
+    "scaffolded_not_wired": [
+      "Digests (hourly/daily/weekly) and per-category subscription roles - schema (subscriptions, job_categories) and digest embed builder exist; scheduling them is the next increment"
+    ]
+  },
+  "open_items": [
+    "Optional: enable GitHub branch protection on master requiring the 'test' status check (must be toggled in GitHub Settings > Branches; cannot be set via CLI here).",
+    "Deploy to the Oracle VM using deploy/jobbot.service and the README 'Linux VM with systemd' guide.",
+    "Consider Playwright path for Workday/Oracle/SuccessFactors postings if JSON-LD extraction returns empty over plain HTTP."
+  ],
+  "changelog": [
+    "2026-07-14 Initial handover.json created after PRs #1-#3 (SQLite/no-Docker, CI, pre-commit)."
+  ]
+}
