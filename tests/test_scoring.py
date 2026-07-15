@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from jobbot.parsing.models import ExtractedJob
 from jobbot.scoring.relevance import score_job
 
-NOW = datetime(2026, 7, 14, tzinfo=timezone.utc)
+NOW = datetime(2026, 7, 14, tzinfo=UTC)
 
 
 def _job(title, desc="", company="Acme", location=None, platform="ashby", posted=None, expired=False):

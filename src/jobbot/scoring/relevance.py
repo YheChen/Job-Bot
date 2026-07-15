@@ -11,7 +11,7 @@ indicator, and must not trip a strong negative, or it is rejected outright
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, Field
 
@@ -65,7 +65,7 @@ def _freshness_score(posted_at: datetime | None, now: datetime) -> float:
     if posted_at is None:
         return 0.5  # unknown → neutral
     if posted_at.tzinfo is None:
-        posted_at = posted_at.replace(tzinfo=timezone.utc)
+        posted_at = posted_at.replace(tzinfo=UTC)
     age_days = (now - posted_at).total_seconds() / 86400
     if age_days <= 3:
         return 1.0
@@ -88,7 +88,7 @@ def score_job(
     already_seen: bool = False,
     now: datetime | None = None,
 ) -> RelevanceResult:
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     preferred_locations = [loc.lower() for loc in (preferred_locations or [])]
     preferred_terms = [t.lower() for t in (preferred_terms or [])]
     negatives_extra = [k.lower() for k in (extra_negative_keywords or [])]
