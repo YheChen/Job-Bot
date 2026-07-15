@@ -8,7 +8,7 @@ Used in two places:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from selectolax.parser import HTMLParser
 
@@ -59,8 +59,8 @@ def evaluate_page(page: PageFetch) -> ExpirationResult:
     if job and job.expires_at:
         exp = job.expires_at
         if exp.tzinfo is None:
-            exp = exp.replace(tzinfo=timezone.utc)
-        if exp < datetime.now(timezone.utc):
+            exp = exp.replace(tzinfo=UTC)
+        if exp < datetime.now(UTC):
             return ExpirationResult(True, "validThrough_past", exp)
 
     reason = detect_expired_in_html(page.html)

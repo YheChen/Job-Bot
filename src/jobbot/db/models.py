@@ -11,6 +11,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
+    JSON,
     BigInteger,
     Boolean,
     DateTime,
@@ -18,7 +19,6 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,
@@ -29,14 +29,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from jobbot.db.base import Base, TimestampMixin
 
 
-class JobStatus(str, enum.Enum):
+class JobStatus(enum.StrEnum):
     active = "active"
     expired = "expired"
     closed = "closed"
     unknown = "unknown"
 
 
-class FeedbackKind(str, enum.Enum):
+class FeedbackKind(enum.StrEnum):
     relevant = "relevant"
     irrelevant = "irrelevant"
     duplicate = "duplicate"
@@ -44,7 +44,7 @@ class FeedbackKind(str, enum.Enum):
     hidden_company = "hidden_company"
 
 
-class ScanStatus(str, enum.Enum):
+class ScanStatus(enum.StrEnum):
     running = "running"
     completed = "completed"
     failed = "failed"
@@ -60,7 +60,7 @@ class Guild(Base, TimestampMixin):
     name: Mapped[str | None] = mapped_column(String(255))
     active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    settings: Mapped["GuildSettings"] = relationship(
+    settings: Mapped[GuildSettings] = relationship(
         back_populates="guild", uselist=False, cascade="all, delete-orphan"
     )
 
@@ -86,7 +86,7 @@ class GuildSettings(Base, TimestampMixin):
     company_domains: Mapped[list] = mapped_column(JSON, default=list)
     disabled_platforms: Mapped[list] = mapped_column(JSON, default=list)
 
-    guild: Mapped["Guild"] = relationship(back_populates="settings")
+    guild: Mapped[Guild] = relationship(back_populates="settings")
 
 
 # --------------------------------------------------------------------------- #
@@ -119,7 +119,7 @@ class SearchQuery(Base, TimestampMixin):
     relevant_results: Mapped[int] = mapped_column(Integer, default=0)
     last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
-    runs: Mapped[list["QueryRun"]] = relationship(back_populates="query")
+    runs: Mapped[list[QueryRun]] = relationship(back_populates="query")
 
 
 class QueryRun(Base):
@@ -141,7 +141,7 @@ class QueryRun(Base):
     relevant_count: Mapped[int] = mapped_column(Integer, default=0)
     error: Mapped[str | None] = mapped_column(Text)
 
-    query: Mapped["SearchQuery"] = relationship(back_populates="runs")
+    query: Mapped[SearchQuery] = relationship(back_populates="runs")
 
 
 class SearchResult(Base):
@@ -216,13 +216,13 @@ class Job(Base, TimestampMixin):
     posted_at_discord: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     discord_message_id: Mapped[int | None] = mapped_column(BigInteger)
 
-    versions: Mapped[list["JobVersion"]] = relationship(
+    versions: Mapped[list[JobVersion]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
-    sources: Mapped[list["JobSource"]] = relationship(
+    sources: Mapped[list[JobSource]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
-    categories: Mapped[list["JobCategory"]] = relationship(
+    categories: Mapped[list[JobCategory]] = relationship(
         back_populates="job", cascade="all, delete-orphan"
     )
 
@@ -243,7 +243,7 @@ class JobVersion(Base):
         DateTime(timezone=True), server_default=func.now()
     )
 
-    job: Mapped["Job"] = relationship(back_populates="versions")
+    job: Mapped[Job] = relationship(back_populates="versions")
 
 
 class JobSource(Base):
@@ -267,7 +267,7 @@ class JobSource(Base):
         DateTime(timezone=True), server_default=func.now()
     )
 
-    job: Mapped["Job"] = relationship(back_populates="sources")
+    job: Mapped[Job] = relationship(back_populates="sources")
 
 
 class JobCategory(Base):
@@ -282,7 +282,7 @@ class JobCategory(Base):
     )
     category: Mapped[str] = mapped_column(String(64), index=True)
 
-    job: Mapped["Job"] = relationship(back_populates="categories")
+    job: Mapped[Job] = relationship(back_populates="categories")
 
 
 # --------------------------------------------------------------------------- #

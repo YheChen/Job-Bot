@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 
@@ -26,7 +26,7 @@ async def mark_posted(job_ids: list[int], message_ids: dict[int, int] | None = N
             if job is None:
                 continue
             job.posted_to_discord = True
-            job.posted_at_discord = datetime.now(timezone.utc)
+            job.posted_at_discord = datetime.now(UTC)
             if jid in message_ids:
                 job.discord_message_id = message_ids[jid]
 

@@ -14,7 +14,7 @@ dedicated connection for the scan's duration.
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 from pydantic import BaseModel
@@ -340,7 +340,7 @@ class ScanService:
         job = await repo.get_job_by_dedup_key(session, dedup_key_val)
         if job is None:
             return
-        job.last_seen_at = datetime.now(timezone.utc)
+        job.last_seen_at = datetime.now(UTC)
 
         new_chash = dd.content_hash(extracted)
         if job.content_hash and new_chash != job.content_hash:
@@ -381,7 +381,7 @@ class ScanService:
             for job in pending:
                 # Expiration re-check right before posting.
                 result = await expiration.check(job.canonical_url)
-                job.last_checked_at = datetime.now(timezone.utc)
+                job.last_checked_at = datetime.now(UTC)
                 if result.is_expired:
                     job.status = JobStatus.expired
                     continue
@@ -409,7 +409,7 @@ class ScanService:
             )
             for job in jobs:
                 result = await expiration.check(job.canonical_url)
-                job.last_checked_at = datetime.now(timezone.utc)
+                job.last_checked_at = datetime.now(UTC)
                 if result.is_expired:
                     job.status = JobStatus.expired
                     marked += 1

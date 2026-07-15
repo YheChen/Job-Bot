@@ -18,7 +18,7 @@ def _platform_display(slug: str | None) -> str:
     return entry[0] if entry else slug.title()
 
 
-def job_embed(job: Job) -> "discord.Embed":
+def job_embed(job: Job) -> discord.Embed:
     title = job.title or "(untitled)"
     if job.internship_term and job.internship_term not in title:
         title = f"{title}, {job.internship_term}"
@@ -67,7 +67,7 @@ def job_embed(job: Job) -> "discord.Embed":
     return embed
 
 
-def digest_embed(title: str, jobs: list[Job]) -> "discord.Embed":
+def digest_embed(title: str, jobs: list[Job]) -> discord.Embed:
     embed = discord.Embed(title=title, color=0x9B59B6)
     for job in jobs[:25]:
         name = (job.title or "(untitled)")[:200]

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,6 @@ from jobbot.db.models import (
     Guild,
     GuildSettings,
     Job,
-    JobSource,
     JobStatus,
     ScanRun,
     ScanStatus,
@@ -114,7 +113,7 @@ async def record_query_run(
     query.times_run += 1
     query.total_results += result_count
     query.relevant_results += relevant_count
-    query.last_run_at = datetime.now(timezone.utc)
+    query.last_run_at = datetime.now(UTC)
 
 
 # --- Jobs ----------------------------------------------------------------- #
@@ -153,7 +152,7 @@ async def candidate_jobs_for_dedup(
 
 
 async def recent_jobs(session: AsyncSession, hours: int = 24, limit: int = 25) -> list[Job]:
-    since = datetime.now(timezone.utc) - timedelta(hours=hours)
+    since = datetime.now(UTC) - timedelta(hours=hours)
     rows = await session.execute(
         select(Job)
         .where(Job.first_seen_at >= since)
@@ -180,7 +179,7 @@ async def jobs_pending_post(
 
 
 async def jobs_to_recheck(session: AsyncSession, older_than_hours: float, limit: int = 50) -> list[Job]:
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=older_than_hours)
+    cutoff = datetime.now(UTC) - timedelta(hours=older_than_hours)
     rows = await session.execute(
         select(Job)
         .where(
@@ -197,7 +196,7 @@ async def mark_job_status(session: AsyncSession, job_id: int, status: JobStatus)
     await session.execute(
         update(Job)
         .where(Job.id == job_id)
-        .values(status=status, last_checked_at=datetime.now(timezone.utc))
+        .values(status=status, last_checked_at=datetime.now(UTC))
     )
 
 
@@ -235,5 +234,5 @@ async def finish_scan_run(
     error: str | None = None,
 ) -> None:
     run.status = status
-    run.finished_at = datetime.now(timezone.utc)
+    run.finished_at = datetime.now(UTC)
     run.error = error

@@ -59,7 +59,7 @@ class GeneratedQuery:
     variant: str  # "title" | "title_term" | "title_location"
     query_hash: str = field(default="", compare=False)
 
-    def with_hash(self) -> "GeneratedQuery":
+    def with_hash(self) -> GeneratedQuery:
         h = hashlib.sha256(self.text.encode()).hexdigest()[:32]
         return GeneratedQuery(
             text=self.text,

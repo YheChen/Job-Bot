@@ -34,7 +34,7 @@ class PlatformRegistry:
         self._company = GenericAdapter("company", "Company", tuple(company_domains or ()))
 
     @classmethod
-    def default(cls, company_domains: list[str] | None = None) -> "PlatformRegistry":
+    def default(cls, company_domains: list[str] | None = None) -> PlatformRegistry:
         adapters: list[PlatformAdapter] = [
             AshbyAdapter(),
             GreenhouseAdapter(),
