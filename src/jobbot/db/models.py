@@ -133,9 +133,7 @@ class QueryRun(Base):
         ForeignKey("scan_runs.id", ondelete="SET NULL"), index=True
     )
     provider: Mapped[str] = mapped_column(String(32))
-    started_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     result_count: Mapped[int] = mapped_column(Integer, default=0)
     relevant_count: Mapped[int] = mapped_column(Integer, default=0)
@@ -168,9 +166,7 @@ class SearchResult(Base):
 # --------------------------------------------------------------------------- #
 class Job(Base, TimestampMixin):
     __tablename__ = "jobs"
-    __table_args__ = (
-        UniqueConstraint("dedup_key", name="uq_jobs_dedup_key"),
-    )
+    __table_args__ = (UniqueConstraint("dedup_key", name="uq_jobs_dedup_key"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
@@ -233,9 +229,7 @@ class JobVersion(Base):
     __tablename__ = "job_versions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    job_id: Mapped[int] = mapped_column(
-        ForeignKey("jobs.id", ondelete="CASCADE"), index=True
-    )
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
     content_hash: Mapped[str] = mapped_column(String(64))
     title: Mapped[str | None] = mapped_column(Text)
     description: Mapped[str | None] = mapped_column(Text)
@@ -250,14 +244,10 @@ class JobSource(Base):
     """A distinct URL/query through which a job was discovered."""
 
     __tablename__ = "job_sources"
-    __table_args__ = (
-        UniqueConstraint("job_id", "raw_url", name="uq_job_source_url"),
-    )
+    __table_args__ = (UniqueConstraint("job_id", "raw_url", name="uq_job_source_url"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    job_id: Mapped[int] = mapped_column(
-        ForeignKey("jobs.id", ondelete="CASCADE"), index=True
-    )
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
     query_id: Mapped[int | None] = mapped_column(
         ForeignKey("search_queries.id", ondelete="SET NULL")
     )
@@ -272,14 +262,10 @@ class JobSource(Base):
 
 class JobCategory(Base):
     __tablename__ = "job_categories"
-    __table_args__ = (
-        UniqueConstraint("job_id", "category", name="uq_job_category"),
-    )
+    __table_args__ = (UniqueConstraint("job_id", "category", name="uq_job_category"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    job_id: Mapped[int] = mapped_column(
-        ForeignKey("jobs.id", ondelete="CASCADE"), index=True
-    )
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
     category: Mapped[str] = mapped_column(String(64), index=True)
 
     job: Mapped[Job] = relationship(back_populates="categories")
@@ -290,9 +276,7 @@ class JobCategory(Base):
 # --------------------------------------------------------------------------- #
 class Subscription(Base, TimestampMixin):
     __tablename__ = "subscriptions"
-    __table_args__ = (
-        UniqueConstraint("guild_id", "user_id", "category", name="uq_subscription"),
-    )
+    __table_args__ = (UniqueConstraint("guild_id", "user_id", "category", name="uq_subscription"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     guild_id: Mapped[int] = mapped_column(BigInteger, index=True)
@@ -302,9 +286,7 @@ class Subscription(Base, TimestampMixin):
 
 class SavedJob(Base, TimestampMixin):
     __tablename__ = "saved_jobs"
-    __table_args__ = (
-        UniqueConstraint("user_id", "job_id", name="uq_saved_job"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "job_id", name="uq_saved_job"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(BigInteger, index=True)
@@ -326,9 +308,7 @@ class Feedback(Base, TimestampMixin):
     __tablename__ = "feedback"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    job_id: Mapped[int] = mapped_column(
-        ForeignKey("jobs.id", ondelete="CASCADE"), index=True
-    )
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), index=True)
     guild_id: Mapped[int | None] = mapped_column(BigInteger, index=True)
     user_id: Mapped[int] = mapped_column(BigInteger)
     kind: Mapped[FeedbackKind] = mapped_column(Enum(FeedbackKind, native_enum=False))
@@ -343,9 +323,7 @@ class ScanRun(Base):
     status: Mapped[ScanStatus] = mapped_column(
         Enum(ScanStatus, native_enum=False), default=ScanStatus.running
     )
-    started_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     queries_run: Mapped[int] = mapped_column(Integer, default=0)
     results_found: Mapped[int] = mapped_column(Integer, default=0)

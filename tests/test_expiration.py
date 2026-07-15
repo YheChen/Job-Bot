@@ -40,5 +40,5 @@ def test_active_job_not_expired(fixture_html):
 
 
 def test_disabled_apply_button_detected():
-    html = '<html><body><button disabled>Apply</button></body></html>'
+    html = "<html><body><button disabled>Apply</button></body></html>"
     assert detect_expired_in_html(html) == "apply_button_disabled"

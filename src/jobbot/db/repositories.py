@@ -32,9 +32,7 @@ async def try_acquire_scan_lock(session: AsyncSession) -> bool:
     """
     if dialect_name() != "postgresql":
         return True
-    result = await session.execute(
-        text("SELECT pg_try_advisory_lock(:k)"), {"k": SCAN_LOCK_KEY}
-    )
+    result = await session.execute(text("SELECT pg_try_advisory_lock(:k)"), {"k": SCAN_LOCK_KEY})
     return bool(result.scalar())
 
 
@@ -58,9 +56,7 @@ async def get_or_create_settings(session: AsyncSession, guild_id: int) -> GuildS
 
 
 async def all_active_guild_settings(session: AsyncSession) -> list[GuildSettings]:
-    rows = await session.execute(
-        select(GuildSettings).where(GuildSettings.paused.is_(False))
-    )
+    rows = await session.execute(select(GuildSettings).where(GuildSettings.paused.is_(False)))
     return list(rows.scalars())
 
 
@@ -162,9 +158,7 @@ async def recent_jobs(session: AsyncSession, hours: int = 24, limit: int = 25) -
     return list(rows.scalars())
 
 
-async def jobs_pending_post(
-    session: AsyncSession, min_score: float, limit: int = 25
-) -> list[Job]:
+async def jobs_pending_post(session: AsyncSession, min_score: float, limit: int = 25) -> list[Job]:
     rows = await session.execute(
         select(Job)
         .where(
@@ -178,7 +172,9 @@ async def jobs_pending_post(
     return list(rows.scalars())
 
 
-async def jobs_to_recheck(session: AsyncSession, older_than_hours: float, limit: int = 50) -> list[Job]:
+async def jobs_to_recheck(
+    session: AsyncSession, older_than_hours: float, limit: int = 50
+) -> list[Job]:
     cutoff = datetime.now(UTC) - timedelta(hours=older_than_hours)
     rows = await session.execute(
         select(Job)
@@ -194,15 +190,11 @@ async def jobs_to_recheck(session: AsyncSession, older_than_hours: float, limit:
 
 async def mark_job_status(session: AsyncSession, job_id: int, status: JobStatus) -> None:
     await session.execute(
-        update(Job)
-        .where(Job.id == job_id)
-        .values(status=status, last_checked_at=datetime.now(UTC))
+        update(Job).where(Job.id == job_id).values(status=status, last_checked_at=datetime.now(UTC))
     )
 
 
-async def is_company_ignored(
-    session: AsyncSession, guild_id: int, normalized_company: str
-) -> bool:
+async def is_company_ignored(session: AsyncSession, guild_id: int, normalized_company: str) -> bool:
     from jobbot.db.models import IgnoredCompany
 
     rows = await session.execute(

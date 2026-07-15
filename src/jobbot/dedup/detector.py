@@ -155,9 +155,7 @@ def find_duplicate(
             t_sim = token_set_ratio(new_title, title_key(c.title))
             if t_sim >= title_threshold:
                 if job.description and c.description:
-                    d_sim = token_set_ratio(
-                        job.description.lower(), (c.description or "").lower()
-                    )
+                    d_sim = token_set_ratio(job.description.lower(), (c.description or "").lower())
                     if d_sim >= desc_threshold:
                         return DuplicateMatch(True, "fuzzy_title_desc", c.dedup_key)
                 else:

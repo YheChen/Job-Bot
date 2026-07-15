@@ -88,8 +88,7 @@ class ScanService:
         ]
         return QueryGenConfig(
             enabled_platforms=enabled,
-            academic_terms=settings_row.academic_terms
-            or QueryGenConfig().academic_terms,
+            academic_terms=settings_row.academic_terms or QueryGenConfig().academic_terms,
             locations=settings_row.locations or QueryGenConfig().locations,
         )
 

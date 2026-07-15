@@ -85,9 +85,7 @@ async def add_company_domain(guild_id: int, domain: str) -> list[str]:
 async def remove_company_domain(guild_id: int, domain: str) -> list[str]:
     async with session_scope() as session:
         s = await repo.get_or_create_settings(session, guild_id)
-        s.company_domains = [
-            d for d in (s.company_domains or []) if d != domain.strip().lower()
-        ]
+        s.company_domains = [d for d in (s.company_domains or []) if d != domain.strip().lower()]
         return s.company_domains
 
 

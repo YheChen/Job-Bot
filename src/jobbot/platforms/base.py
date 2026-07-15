@@ -90,9 +90,7 @@ class PlatformAdapter:
     # --- helpers -------------------------------------------------------- #
     @staticmethod
     def _og(tree: HTMLParser, prop: str) -> str | None:
-        node = tree.css_first(f'meta[property="{prop}"]') or tree.css_first(
-            f'meta[name="{prop}"]'
-        )
+        node = tree.css_first(f'meta[property="{prop}"]') or tree.css_first(f'meta[name="{prop}"]')
         if node:
             content = node.attributes.get("content")
             if content:
