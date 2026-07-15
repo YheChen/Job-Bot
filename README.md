@@ -103,18 +103,50 @@ Job Bot/
 
 ---
 
-## Quick start (Docker Compose)
+## Quick start — no Docker (SQLite)
+
+The bot runs with **zero external services**: it defaults to a local SQLite file,
+so all you need is Python 3.12+.
 
 ```bash
 cp .env.example .env
-# Edit .env: set DISCORD_TOKEN and one search provider key
-# (or set SEARCH_PROVIDERS=mock to run the whole pipeline with no API key).
+# Edit .env: set DISCORD_TOKEN. Leave DATABASE_URL as the SQLite default.
+# Set SEARCH_PROVIDERS=mock to try the whole pipeline with no API key,
+# or set a real provider key (e.g. SERPER_API_KEY).
 
+make install     # creates .venv and installs the package
+make migrate     # creates jobbot.db and its tables
+make run         # starts the bot
+```
+
+Or without `make`:
+
+```bash
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+alembic upgrade head        # reads DATABASE_URL from .env / environment
+jobbot                      # or: python -m jobbot.main
+```
+
+The health endpoint is at `http://localhost:8080/health`.
+
+> **SQLite vs Postgres.** SQLite is perfect for a single instance. The only
+> Postgres-specific feature is the cross-process scan advisory lock; on SQLite
+> the scheduler's in-process lock serializes scans instead (correct for one
+> instance). For multiple instances or heavier load, switch `DATABASE_URL` to
+> Postgres — no code changes needed.
+
+## Quick start — Docker Compose (Postgres)
+
+Prefer containers / Postgres? Compose is still fully supported:
+
+```bash
+cp .env.example .env         # set DISCORD_TOKEN (+ provider key)
 docker compose up --build
 ```
 
-Compose starts Postgres, runs `alembic upgrade head`, then launches the bot. The
-health endpoint is exposed at `http://localhost:8080/health`.
+Compose starts Postgres, runs `alembic upgrade head`, then launches the bot.
+(The compose file overrides `DATABASE_URL` to point at the Postgres service.)
 
 ### Discord setup
 
@@ -129,24 +161,12 @@ health endpoint is exposed at `http://localhost:8080/health`.
 
 ---
 
-## Local development (without Docker)
+## Tests
+
+Run the suite (no database or network required — the pipeline pieces are pure):
 
 ```bash
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-
-# Start just Postgres:
-docker compose up -d db
-
-export $(grep -v '^#' .env | xargs)   # or use a dotenv loader
-alembic upgrade head
-jobbot                                 # or: python -m jobbot.main
-```
-
-Run the tests (no database or network required — the pipeline pieces are pure):
-
-```bash
-pytest -q
+make test        # or: pytest -q
 ```
 
 ---
@@ -206,9 +226,67 @@ are scaffolded and gated for follow-up work:
 
 ## Deployment
 
-All targets run the same container. Provide the env vars from `.env.example` via
-the platform's secret manager — **never commit `.env`**. The container runs
-migrations on start via `docker/entrypoint.sh`.
+### Linux VM with systemd (Oracle Cloud, Raspberry Pi, any VPS) — recommended for SQLite
+
+This is the simplest production setup: one always-on process, the SQLite file on
+local disk, restarts handled by systemd. No Docker, no database server. Works on
+ARM64 (Oracle Ampere / Raspberry Pi) — the base install has **no compiled
+Postgres drivers**.
+
+```bash
+# 1. System deps (Ubuntu/Debian on the VM)
+sudo apt update && sudo apt install -y python3.12 python3.12-venv git
+
+# 2. Create a service user + app dir
+sudo useradd --system --create-home --home-dir /opt/jobbot jobbot
+sudo -u jobbot git clone <your-repo-url> /opt/jobbot
+cd /opt/jobbot
+
+# 3. Install into a venv (SQLite only — no extras needed)
+sudo -u jobbot python3.12 -m venv .venv
+sudo -u jobbot .venv/bin/pip install --upgrade pip
+sudo -u jobbot .venv/bin/pip install .
+
+# 4. Configure. Use an ABSOLUTE SQLite path (note the four slashes).
+sudo -u jobbot cp .env.example .env
+sudo -u jobbot nano .env
+#   DISCORD_TOKEN=...
+#   SEARCH_PROVIDERS=serper
+#   SERPER_API_KEY=...
+#   DATABASE_URL=sqlite+aiosqlite:////opt/jobbot/jobbot.db
+
+# 5. Create the database
+sudo -u jobbot .venv/bin/alembic upgrade head
+
+# 6. Install and start the service
+sudo cp deploy/jobbot.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now jobbot
+sudo journalctl -u jobbot -f          # tail logs
+```
+
+To update: `git pull`, `.venv/bin/pip install .`, `.venv/bin/alembic upgrade
+head`, `sudo systemctl restart jobbot`.
+
+> **Oracle Cloud note.** The bot only makes *outbound* connections (Discord
+> gateway, search API, job pages), so you do **not** need to open any inbound
+> ports in the VCN security list or the VM's iptables for it to work. The
+> `/health` endpoint binds locally; only expose port 8080 if you want to probe it
+> from outside (and add the matching ingress rule if so). Oracle's Ubuntu images
+> ship with restrictive iptables by default — that's fine here.
+
+> **Backups.** The entire state is one file. Back it up with a cron job:
+> `sqlite3 /opt/jobbot/jobbot.db ".backup /opt/jobbot/backup-$(date +\%F).db"`.
+
+### Container platforms (Docker / Postgres)
+
+The steps below run the same container image and use Postgres. Provide the env
+vars from `.env.example` via the platform's secret manager — **never commit
+`.env`**. The container runs migrations on start via `docker/entrypoint.sh`.
+
+> For SQLite on Fly/Render, attach a persistent volume and set
+> `DATABASE_URL=sqlite+aiosqlite:////data/jobbot.db`. Without a volume the file
+> resets on redeploy. On a plain VM (above) this isn't a concern.
 
 ### Fly.io
 

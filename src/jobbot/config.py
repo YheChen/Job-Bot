@@ -11,10 +11,10 @@ the database and are editable through Discord commands. This module holds only
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 SearchProviderName = Literal["serper", "bing", "brave", "google_pse", "mock"]
 
@@ -35,9 +35,11 @@ class Settings(BaseSettings):
     log_json: bool = False
 
     # --- Discord ---
+    # NoDecode: these arrive as comma/space-separated env strings, not JSON, so
+    # we disable pydantic-settings' JSON decoding and split them ourselves.
     discord_token: str = Field(..., min_length=10)
-    discord_guild_ids: list[int] = Field(default_factory=list)
-    discord_manager_role_ids: list[int] = Field(default_factory=list)
+    discord_guild_ids: Annotated[list[int], NoDecode] = Field(default_factory=list)
+    discord_manager_role_ids: Annotated[list[int], NoDecode] = Field(default_factory=list)
 
     # --- Database ---
     # Defaults to a local SQLite file so the bot runs with no external services.
@@ -47,7 +49,9 @@ class Settings(BaseSettings):
 
     # --- Search providers ---
     # Ordered list; the first with remaining quota is used, others are fallbacks.
-    search_providers: list[SearchProviderName] = Field(default=["serper"])
+    search_providers: Annotated[list[SearchProviderName], NoDecode] = Field(
+        default=["serper"]
+    )
     serper_api_key: str | None = None
     bing_api_key: str | None = None
     brave_api_key: str | None = None
