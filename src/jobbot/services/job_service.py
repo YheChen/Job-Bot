@@ -42,13 +42,9 @@ async def recent(hours: int = 24, limit: int = 25) -> list[Job]:
         return await repo.recent_jobs(session, hours=hours, limit=limit)
 
 
-async def add_feedback(
-    job_id: int, guild_id: int | None, user_id: int, kind: FeedbackKind
-) -> None:
+async def add_feedback(job_id: int, guild_id: int | None, user_id: int, kind: FeedbackKind) -> None:
     async with session_scope() as session:
-        session.add(
-            Feedback(job_id=job_id, guild_id=guild_id, user_id=user_id, kind=kind)
-        )
+        session.add(Feedback(job_id=job_id, guild_id=guild_id, user_id=user_id, kind=kind))
         if kind == FeedbackKind.irrelevant:
             job = await session.get(Job, job_id)
             if job:
@@ -93,9 +89,7 @@ async def hide_company(guild_id: int, job_id: int) -> str | None:
         )
         if exists.scalar_one_or_none() is None:
             session.add(
-                IgnoredCompany(
-                    guild_id=guild_id, normalized_company=job.normalized_company
-                )
+                IgnoredCompany(guild_id=guild_id, normalized_company=job.normalized_company)
             )
         return job.company
 
@@ -110,16 +104,12 @@ async def stats() -> dict:
         ).scalar()
         posted = (
             await session.execute(
-                select(func.count())
-                .select_from(Job)
-                .where(Job.posted_to_discord.is_(True))
+                select(func.count()).select_from(Job).where(Job.posted_to_discord.is_(True))
             )
         ).scalar()
         expired = (
             await session.execute(
-                select(func.count())
-                .select_from(Job)
-                .where(Job.status == JobStatus.expired)
+                select(func.count()).select_from(Job).where(Job.status == JobStatus.expired)
             )
         ).scalar()
         return {

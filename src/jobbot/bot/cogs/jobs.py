@@ -104,9 +104,7 @@ class JobsCog(commands.Cog):
         if not qs:
             await interaction.response.send_message("No queries run yet.", ephemeral=True)
             return
-        lines = [
-            f"`{q.times_run}x` rel={q.relevant_results} — {q.query_text[:90]}" for q in qs
-        ]
+        lines = [f"`{q.times_run}x` rel={q.relevant_results} — {q.query_text[:90]}" for q in qs]
         await interaction.response.send_message("\n".join(lines)[:1900], ephemeral=True)
 
     @jobs.command(name="companies", description="Show top companies by discovered jobs")
@@ -137,9 +135,7 @@ class JobsCog(commands.Cog):
         if not jobs:
             await interaction.followup.send("You have no saved jobs.", ephemeral=True)
             return
-        await interaction.followup.send(
-            embeds=[job_embed(j) for j in jobs], ephemeral=True
-        )
+        await interaction.followup.send(embeds=[job_embed(j) for j in jobs], ephemeral=True)
 
     @jobs.command(name="status", description="Show bot / scan status")
     async def status(self, interaction: discord.Interaction) -> None:
@@ -154,9 +150,7 @@ class JobsCog(commands.Cog):
 
     @jobs.command(name="scan", description="Manually trigger a scan (admins)")
     @app_commands.describe(platform="Restrict to one platform slug (optional)")
-    async def scan(
-        self, interaction: discord.Interaction, platform: str | None = None
-    ) -> None:
+    async def scan(self, interaction: discord.Interaction, platform: str | None = None) -> None:
         if interaction.guild_id is None:
             await interaction.response.send_message("Guild only.", ephemeral=True)
             return
@@ -178,7 +172,6 @@ class JobsCog(commands.Cog):
             f"{report.results_found} results, {report.jobs_new} new, "
             f"{report.jobs_posted} posted."
         )
-
 
     # ================================================================== #
     # Admin / configuration commands (Administrator or bot-manager role)
@@ -207,27 +200,21 @@ class JobsCog(commands.Cog):
         scheduler = getattr(self.bot, "scheduler_runner", None)
         if scheduler:
             scheduler.reschedule(interaction.guild_id, hours)
-        await interaction.response.send_message(
-            f"Scan interval set to {hours}h.", ephemeral=True
-        )
+        await interaction.response.send_message(f"Scan interval set to {hours}h.", ephemeral=True)
 
     @jobs.command(name="set-locations", description="Comma-separated preferred locations")
     async def set_locations(self, interaction: discord.Interaction, locations: str) -> None:
         if not await self._ensure_manager(interaction):
             return
         vals = await settings_service.set_locations(interaction.guild_id, locations)
-        await interaction.response.send_message(
-            f"Locations set: {', '.join(vals)}", ephemeral=True
-        )
+        await interaction.response.send_message(f"Locations set: {', '.join(vals)}", ephemeral=True)
 
     @jobs.command(name="set-terms", description="Comma-separated academic terms")
     async def set_terms(self, interaction: discord.Interaction, terms: str) -> None:
         if not await self._ensure_manager(interaction):
             return
         vals = await settings_service.set_terms(interaction.guild_id, terms)
-        await interaction.response.send_message(
-            f"Terms set: {', '.join(vals)}", ephemeral=True
-        )
+        await interaction.response.send_message(f"Terms set: {', '.join(vals)}", ephemeral=True)
 
     @jobs.command(name="set-keywords", description="Comma-separated extra keywords")
     async def set_keywords(self, interaction: discord.Interaction, keywords: str) -> None:
@@ -239,9 +226,7 @@ class JobsCog(commands.Cog):
         )
 
     @jobs.command(name="set-negative-keywords", description="Comma-separated negative keywords")
-    async def set_negative_keywords(
-        self, interaction: discord.Interaction, keywords: str
-    ) -> None:
+    async def set_negative_keywords(self, interaction: discord.Interaction, keywords: str) -> None:
         if not await self._ensure_manager(interaction):
             return
         vals = await settings_service.set_negative_keywords(interaction.guild_id, keywords)
@@ -273,9 +258,7 @@ class JobsCog(commands.Cog):
         await interaction.response.send_message(f"Disabled `{slug}`.", ephemeral=True)
 
     @jobs.command(name="add-company-domain", description="Track a company career domain")
-    async def add_company_domain(
-        self, interaction: discord.Interaction, domain: str
-    ) -> None:
+    async def add_company_domain(self, interaction: discord.Interaction, domain: str) -> None:
         if not await self._ensure_manager(interaction):
             return
         vals = await settings_service.add_company_domain(interaction.guild_id, domain)
@@ -284,9 +267,7 @@ class JobsCog(commands.Cog):
         )
 
     @jobs.command(name="remove-company-domain", description="Stop tracking a company domain")
-    async def remove_company_domain(
-        self, interaction: discord.Interaction, domain: str
-    ) -> None:
+    async def remove_company_domain(self, interaction: discord.Interaction, domain: str) -> None:
         if not await self._ensure_manager(interaction):
             return
         vals = await settings_service.remove_company_domain(interaction.guild_id, domain)

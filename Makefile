@@ -1,9 +1,13 @@
-.PHONY: install migrate run test lint fmt clean
+.PHONY: install hooks migrate run test lint fmt clean
 
 # One-time setup: create a venv and install the package (SQLite, no Docker).
 install:
 	python3.12 -m venv .venv
 	. .venv/bin/activate && pip install --upgrade pip && pip install -e ".[dev]"
+
+# Install the git pre-commit hooks (run after `make install`).
+hooks:
+	. .venv/bin/activate && pre-commit install
 
 # Apply database migrations (creates jobbot.db for SQLite).
 migrate:

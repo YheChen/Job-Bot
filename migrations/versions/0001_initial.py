@@ -8,12 +8,13 @@ The initial schema is created directly from the SQLAlchemy metadata so it stays
 in lock-step with the ORM models. Subsequent migrations should be generated with
 `alembic revision --autogenerate` and use explicit op.* operations.
 """
+
 from __future__ import annotations
 
 from alembic import op
 
-from jobbot.db.base import Base
 from jobbot.db import models  # noqa: F401  (register tables on metadata)
+from jobbot.db.base import Base
 
 revision = "0001_initial"
 down_revision = None

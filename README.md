@@ -169,6 +169,22 @@ Run the suite (no database or network required — the pipeline pieces are pure)
 make test        # or: pytest -q
 ```
 
+## Code quality
+
+Lint and format with ruff, and enable the git pre-commit hooks so issues are
+caught before they reach CI:
+
+```bash
+make hooks       # one-time: installs the pre-commit git hook (needs make install first)
+make lint        # ruff check
+make fmt         # ruff format
+```
+
+`pre-commit install` wires up `.pre-commit-config.yaml` (ruff lint + format plus
+whitespace/YAML/TOML hygiene). The same checks run in CI
+(`.github/workflows/ci.yml`) on every push and PR to `master`: ruff lint, ruff
+format check, the pytest suite, and a SQLite `alembic upgrade head` smoke test.
+
 ---
 
 ## Search providers

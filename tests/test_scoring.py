@@ -8,7 +8,9 @@ from jobbot.scoring.relevance import score_job
 NOW = datetime(2026, 7, 14, tzinfo=UTC)
 
 
-def _job(title, desc="", company="Acme", location=None, platform="ashby", posted=None, expired=False):
+def _job(
+    title, desc="", company="Acme", location=None, platform="ashby", posted=None, expired=False
+):
     return ExtractedJob(
         url="https://jobs.ashbyhq.com/acme/1",
         title=title,

@@ -31,7 +31,12 @@ class BingProvider(HTTPProviderBase):
     ) -> list[SearchResult]:
         self._guard()
         offset = (page - 1) * results_per_page
-        params = {"q": query, "count": results_per_page, "offset": offset, "responseFilter": "Webpages"}
+        params = {
+            "q": query,
+            "count": results_per_page,
+            "offset": offset,
+            "responseFilter": "Webpages",
+        }
         headers = {"Ocp-Apim-Subscription-Key": self._api_key}
         resp = await self._client.get(_ENDPOINT, params=params, headers=headers)
         if resp.status_code == 429:

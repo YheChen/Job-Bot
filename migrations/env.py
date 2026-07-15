@@ -8,10 +8,10 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from jobbot.config import get_settings
-from jobbot.db.base import Base
 
 # Import models so their tables register on Base.metadata.
 from jobbot.db import models  # noqa: F401
+from jobbot.db.base import Base
 
 config = context.config
 if config.config_file_name is not None:

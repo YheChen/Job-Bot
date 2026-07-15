@@ -40,9 +40,10 @@ def test_company_domain_allowlisted():
 
 def test_workday_requisition_id_extraction(registry):
     adapter = registry.resolve("https://acme.wd1.myworkdayjobs.com/careers/job/x_R-12345")
-    assert adapter.extract_job_id(
-        "https://acme.wd1.myworkdayjobs.com/careers/job/x_R-12345"
-    ) == "R-12345"
+    assert (
+        adapter.extract_job_id("https://acme.wd1.myworkdayjobs.com/careers/job/x_R-12345")
+        == "R-12345"
+    )
 
 
 def test_greenhouse_id_extraction(registry):

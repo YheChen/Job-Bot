@@ -26,7 +26,9 @@ class ExpirationResult:
     expires_at: datetime | None = None
 
 
-def detect_expired_in_html(html: str, phrases: tuple[str, ...] = DEFAULT_EXPIRED_PHRASES) -> str | None:
+def detect_expired_in_html(
+    html: str, phrases: tuple[str, ...] = DEFAULT_EXPIRED_PHRASES
+) -> str | None:
     lowered = html.lower()
     for phrase in phrases:
         if phrase in lowered:
@@ -34,14 +36,10 @@ def detect_expired_in_html(html: str, phrases: tuple[str, ...] = DEFAULT_EXPIRED
     # Disabled/missing application button heuristic.
     tree = HTMLParser(html)
     apply_nodes = [
-        n
-        for n in tree.css("button, a")
-        if "apply" in (n.text(strip=True) or "").lower()
+        n for n in tree.css("button, a") if "apply" in (n.text(strip=True) or "").lower()
     ]
     disabled = [
-        n
-        for n in apply_nodes
-        if "disabled" in n.attributes or "aria-disabled" in n.attributes
+        n for n in apply_nodes if "disabled" in n.attributes or "aria-disabled" in n.attributes
     ]
     if apply_nodes and len(disabled) == len(apply_nodes):
         return "apply_button_disabled"

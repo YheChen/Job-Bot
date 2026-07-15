@@ -31,9 +31,7 @@ def init_engine(database_url: str, echo: bool = False) -> AsyncEngine:
                 pool_size=5,
                 max_overflow=10,
             )
-        _sessionmaker = async_sessionmaker(
-            _engine, expire_on_commit=False, class_=AsyncSession
-        )
+        _sessionmaker = async_sessionmaker(_engine, expire_on_commit=False, class_=AsyncSession)
     return _engine
 
 

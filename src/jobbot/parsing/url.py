@@ -44,9 +44,7 @@ def strip_tracking_params(query: str, host: str = "") -> str:
     kept: list[tuple[str, str]] = []
     for key, value in pairs:
         lower = key.lower()
-        if lower in TRACKING_PARAMS and not (
-            lower == "gh_jid" and "greenhouse" in host
-        ):
+        if lower in TRACKING_PARAMS and not (lower == "gh_jid" and "greenhouse" in host):
             continue
         kept.append((key, value))
     kept.sort()

@@ -51,9 +51,7 @@ def job_embed(job: Job) -> discord.Embed:
             inline=True,
         )
 
-    embed.add_field(
-        name="Relevance", value=f"{job.relevance_score:.2f}", inline=True
-    )
+    embed.add_field(name="Relevance", value=f"{job.relevance_score:.2f}", inline=True)
     if job.matched_keywords:
         embed.add_field(
             name="Match",

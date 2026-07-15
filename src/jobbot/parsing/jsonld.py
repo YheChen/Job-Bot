@@ -105,9 +105,7 @@ def extract_jobposting(html: str) -> ExtractedJob | None:
                 if isinstance(node.get("identifier"), dict)
                 else None,
                 expires_at=valid_through,
-                remote_status="Remote"
-                if node.get("jobLocationType") == "TELECOMMUTE"
-                else None,
+                remote_status="Remote" if node.get("jobLocationType") == "TELECOMMUTE" else None,
                 source="jsonld",
                 raw=node,
             )

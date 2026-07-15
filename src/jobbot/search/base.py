@@ -19,8 +19,7 @@ class SearchProvider(Protocol):
         *,
         page: int = 1,
         results_per_page: int = 10,
-    ) -> list[SearchResult]:
-        ...
+    ) -> list[SearchResult]: ...
 
 
 class QuotaTracker:

@@ -49,9 +49,7 @@ class Settings(BaseSettings):
 
     # --- Search providers ---
     # Ordered list; the first with remaining quota is used, others are fallbacks.
-    search_providers: Annotated[list[SearchProviderName], NoDecode] = Field(
-        default=["serper"]
-    )
+    search_providers: Annotated[list[SearchProviderName], NoDecode] = Field(default=["serper"])
     serper_api_key: str | None = None
     bing_api_key: str | None = None
     brave_api_key: str | None = None

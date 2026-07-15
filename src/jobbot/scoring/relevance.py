@@ -115,9 +115,7 @@ def score_job(
     if non_sw and not sw_hits:
         is_software = False
 
-    negatives = contains_any(haystack, NEGATIVE_KEYWORDS) + contains_any(
-        haystack, negatives_extra
-    )
+    negatives = contains_any(haystack, NEGATIVE_KEYWORDS) + contains_any(haystack, negatives_extra)
 
     if job.is_expired:
         reasons.append("expired")
@@ -147,8 +145,10 @@ def score_job(
         reasons.append("no software indicator")
 
     # Title match — a software title in the *title* field specifically.
-    if job.title and contains_any(job.title, SOFTWARE_INDICATORS) and contains_any(
-        job.title, INTERNSHIP_INDICATORS
+    if (
+        job.title
+        and contains_any(job.title, SOFTWARE_INDICATORS)
+        and contains_any(job.title, INTERNSHIP_INDICATORS)
     ):
         score += _W["title"]
         breakdown["title"] = _W["title"]

@@ -22,9 +22,7 @@ class JobActionView(discord.ui.View):
         )
         if careers_url:
             self.add_item(
-                discord.ui.Button(
-                    label="Careers", style=discord.ButtonStyle.link, url=careers_url
-                )
+                discord.ui.Button(label="Careers", style=discord.ButtonStyle.link, url=careers_url)
             )
         # Stateful buttons need custom_ids that embed the job id.
         self._add_feedback_buttons(job_id)
