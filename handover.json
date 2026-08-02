@@ -1,7 +1,7 @@
 {
   "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
   "schema_version": "1.0",
-  "last_updated": "2026-07-14",
+  "last_updated": "2026-08-02",
   "project": {
     "name": "jobbot",
     "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
@@ -12,12 +12,13 @@
     "local_path": "/Users/yanzhenchen/Desktop/GitHub Projects/Job Bot"
   },
   "deployment": {
-    "target": "Single always-on Linux VM (planned: Oracle Cloud free-tier Ampere ARM; fallback: Raspberry Pi). No Docker needed.",
-    "database": "SQLite by default (local file, zero external services). Postgres supported by switching DATABASE_URL; only Postgres-specific feature is the cross-process scan advisory lock.",
-    "sqlite_path_note": "Use an ABSOLUTE path in DATABASE_URL, e.g. sqlite+aiosqlite:////opt/jobbot/jobbot.db (four slashes).",
-    "process_manager": "systemd unit at deploy/jobbot.service (runs as 'jobbot' user under /opt/jobbot).",
-    "oracle_cloud_gotcha": "Bot only makes OUTBOUND connections; no inbound VCN/iptables rules needed. /health binds locally.",
-    "docker_status": "Docker + Postgres path still fully supported (docker-compose.yml). Dockerfile installs the .[postgres] extra."
+    "target": "User's Lenovo ThinkPad T14 Gen 1 home server (Fedora Workstation, dual-boot with Windows; Docker + compose preinstalled, firewalld + SELinux stay ON). Deploy via Docker Compose + Postgres using docker-compose.prod.yml (DEPLOY.md Path A).",
+    "alternatives": "Path B: systemd + SQLite bare-metal (deploy/jobbot.service) for Oracle Cloud VM / Raspberry Pi. Path C: Fly/Railway/Render/AWS. All documented in DEPLOY.md.",
+    "database": "Postgres in compose for the ThinkPad deployment; SQLite remains the zero-service default for bare-metal (DATABASE_URL switch, no code changes). Only Postgres-specific feature is the cross-process scan advisory lock.",
+    "sqlite_path_note": "Bare-metal SQLite needs an ABSOLUTE path, e.g. sqlite+aiosqlite:////opt/jobbot/jobbot.db (four slashes).",
+    "prod_compose_notes": "docker-compose.prod.yml is STANDALONE (not an overlay): 127.0.0.1-only port binds (Docker publishing bypasses firewalld), restart: unless-stopped, POSTGRES_PASSWORD is REQUIRED via .env (no default — GitGuardian flags literal creds; also baked into pgdata on first init).",
+    "laptop_server_prep": "logind HandleLidSwitch=ignore, mask sleep/suspend/hibernate targets, Linux as GRUB default — commands in DEPLOY.md Path A.",
+    "network_gotcha": "Bot only makes OUTBOUND connections; no inbound ports/forwarding/firewall changes on any path. /health binds to localhost."
   },
   "key_decisions": [
     "Deterministic-first: query gen, URL canonicalization, dedup, and relevance scoring are pure/tested functions. LLM classification is opt-in (ENABLE_LLM_CLASSIFICATION) and only refines an already-passing result.",
@@ -28,15 +29,17 @@
     "Postgres drivers (asyncpg/psycopg) moved to optional [postgres] extra so base install is ARM-friendly with no compiled deps."
   ],
   "current_state": {
-    "latest_commit": "455ed27",
     "branch": "master (clean)",
     "tests": "64 passing (pytest); pure logic, no DB/network required",
     "db_schema": "15 tables, created via alembic upgrade head (migrations/versions/0001_initial.py uses metadata.create_all)",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
+    "deployment_status": "NOT yet deployed anywhere — the bot has never made a real Discord connection or real search-API call; everything verified via tests/mocks. First real run = deploying to the ThinkPad (DEPLOY.md Path A).",
     "merged_prs": [
       "#1 Run without Docker: SQLite default + Linux VM deployment",
       "#2 Add CI workflow (ruff + pytest + migration smoke) and fix lint",
-      "#3 Add pre-commit hooks + enforce formatting in CI"
+      "#3 Add pre-commit hooks + enforce formatting in CI",
+      "#4 Add handover.json for session/context handover",
+      "#5 Add DEPLOY.md + production compose file"
     ]
   },
   "conventions": {
@@ -81,11 +84,13 @@
     ]
   },
   "open_items": [
+    "Deploy to the ThinkPad home server via DEPLOY.md Path A (Docker Compose) — this is the first REAL run; watch how extraction/scoring behave on live ATS pages.",
     "Optional: enable GitHub branch protection on master requiring the 'test' status check (must be toggled in GitHub Settings > Branches; cannot be set via CLI here).",
-    "Deploy to the Oracle VM using deploy/jobbot.service and the README 'Linux VM with systemd' guide.",
-    "Consider Playwright path for Workday/Oracle/SuccessFactors postings if JSON-LD extraction returns empty over plain HTTP."
+    "Consider Playwright path for Workday/Oracle/SuccessFactors postings if JSON-LD extraction returns empty over plain HTTP.",
+    "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
-    "2026-07-14 Initial handover.json created after PRs #1-#3 (SQLite/no-Docker, CI, pre-commit)."
+    "2026-07-14 Initial handover.json created after PRs #1-#3 (SQLite/no-Docker, CI, pre-commit).",
+    "2026-08-02 PR #5: DEPLOY.md (3 deployment paths + troubleshooting), standalone docker-compose.prod.yml, POSTGRES_PASSWORD in .env.example, README deployment section slimmed to a pointer. Deployment target changed: user bought a ThinkPad T14 (Fedora, dual-boot) as home server, replacing the Oracle VM plan."
   ]
 }
