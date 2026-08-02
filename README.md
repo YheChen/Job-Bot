@@ -242,103 +242,17 @@ are scaffolded and gated for follow-up work:
 
 ## Deployment
 
-### Linux VM with systemd (Oracle Cloud, Raspberry Pi, any VPS) — recommended for SQLite
+Full runbooks live in **[DEPLOY.md](DEPLOY.md)**, including Discord application
+setup, verification steps, and troubleshooting. Three supported paths:
 
-This is the simplest production setup: one always-on process, the SQLite file on
-local disk, restarts handled by systemd. No Docker, no database server. Works on
-ARM64 (Oracle Ampere / Raspberry Pi) — the base install has **no compiled
-Postgres drivers**.
+| Path | Stack | Best for |
+|---|---|---|
+| **A. Docker Compose** ([docker-compose.prod.yml](docker-compose.prod.yml)) | containers + Postgres, localhost-only ports, restart policies | A Linux box you own (home server, ThinkPad, VPS) with Docker |
+| **B. systemd + SQLite** ([deploy/jobbot.service](deploy/jobbot.service)) | bare metal, no Docker, no DB server | Oracle Cloud free tier, Raspberry Pi, tiny VPS (ARM-friendly) |
+| **C. Managed platforms** | the same container image | Fly.io, Railway, Render, AWS ECS |
 
-```bash
-# 1. System deps (Ubuntu/Debian on the VM)
-sudo apt update && sudo apt install -y python3.12 python3.12-venv git
-
-# 2. Create a service user + app dir
-sudo useradd --system --create-home --home-dir /opt/jobbot jobbot
-sudo -u jobbot git clone <your-repo-url> /opt/jobbot
-cd /opt/jobbot
-
-# 3. Install into a venv (SQLite only — no extras needed)
-sudo -u jobbot python3.12 -m venv .venv
-sudo -u jobbot .venv/bin/pip install --upgrade pip
-sudo -u jobbot .venv/bin/pip install .
-
-# 4. Configure. Use an ABSOLUTE SQLite path (note the four slashes).
-sudo -u jobbot cp .env.example .env
-sudo -u jobbot nano .env
-#   DISCORD_TOKEN=...
-#   SEARCH_PROVIDERS=serper
-#   SERPER_API_KEY=...
-#   DATABASE_URL=sqlite+aiosqlite:////opt/jobbot/jobbot.db
-
-# 5. Create the database
-sudo -u jobbot .venv/bin/alembic upgrade head
-
-# 6. Install and start the service
-sudo cp deploy/jobbot.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now jobbot
-sudo journalctl -u jobbot -f          # tail logs
-```
-
-To update: `git pull`, `.venv/bin/pip install .`, `.venv/bin/alembic upgrade
-head`, `sudo systemctl restart jobbot`.
-
-> **Oracle Cloud note.** The bot only makes *outbound* connections (Discord
-> gateway, search API, job pages), so you do **not** need to open any inbound
-> ports in the VCN security list or the VM's iptables for it to work. The
-> `/health` endpoint binds locally; only expose port 8080 if you want to probe it
-> from outside (and add the matching ingress rule if so). Oracle's Ubuntu images
-> ship with restrictive iptables by default — that's fine here.
-
-> **Backups.** The entire state is one file. Back it up with a cron job:
-> `sqlite3 /opt/jobbot/jobbot.db ".backup /opt/jobbot/backup-$(date +\%F).db"`.
-
-### Container platforms (Docker / Postgres)
-
-The steps below run the same container image and use Postgres. Provide the env
-vars from `.env.example` via the platform's secret manager — **never commit
-`.env`**. The container runs migrations on start via `docker/entrypoint.sh`.
-
-> For SQLite on Fly/Render, attach a persistent volume and set
-> `DATABASE_URL=sqlite+aiosqlite:////data/jobbot.db`. Without a volume the file
-> resets on redeploy. On a plain VM (above) this isn't a concern.
-
-### Fly.io
-
-```bash
-fly launch --no-deploy                       # generates fly.toml
-fly postgres create && fly postgres attach <db-app>   # sets DATABASE_URL
-fly secrets set DISCORD_TOKEN=... SERPER_API_KEY=...
-# In fly.toml: set internal_port = 8080 and a [[services.http_checks]] path "/health"
-fly deploy
-```
-Use `postgresql+asyncpg://...` for `DATABASE_URL` (rewrite the attached URL).
-
-### Railway
-
-1. New Project → Deploy from repo (Dockerfile detected).
-2. Add the **PostgreSQL** plugin; reference `${{Postgres.DATABASE_URL}}` and
-   prefix the scheme with `postgresql+asyncpg://`.
-3. Add `DISCORD_TOKEN` and provider keys as service variables. Railway builds and
-   runs the container; the entrypoint migrates automatically.
-
-### Render
-
-1. **New → Web Service** from the repo (Docker runtime).
-2. **New → PostgreSQL**; copy its internal URL into `DATABASE_URL`
-   (`postgresql+asyncpg://...`).
-3. Set Health Check Path to `/health`, add secrets, deploy.
-
-### AWS (ECS Fargate)
-
-1. Build & push the image to ECR.
-2. Create an RDS Postgres instance; store `DATABASE_URL` and `DISCORD_TOKEN` in
-   Secrets Manager.
-3. Define a Fargate task (1 container) injecting those secrets; open container
-   port 8080 and point the ALB/target-group health check at `/health`.
-4. Run as a long-lived service (desired count 1 — a single instance owns the
-   scan advisory lock).
+The bot only makes **outbound** connections — no inbound ports, port
+forwarding, or firewall changes are needed on any path. Never commit `.env`.
 
 ---
 

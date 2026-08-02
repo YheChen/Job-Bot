@@ -1,0 +1,55 @@
+# Production Docker Compose for a self-hosted Linux box (home server / VPS).
+#
+# Standalone file — run it on its own, do NOT combine with docker-compose.yml:
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Differences from the dev compose file:
+#   * Ports bind to 127.0.0.1 only. Docker's port publishing bypasses
+#     firewalld/ufw, so a 0.0.0.0 bind would expose Postgres and the health
+#     endpoint to the whole LAN. The bot itself only needs OUTBOUND network.
+#   * restart: unless-stopped on both services, so the stack survives reboots
+#     (requires the Docker daemon to be enabled at boot).
+#   * POSTGRES_PASSWORD is REQUIRED (set it in .env) — there is deliberately
+#     no default password in this file. NOTE: Postgres only applies the
+#     password when the pgdata volume is first created — changing it later
+#     requires `docker compose down -v` (destroys data) or an ALTER USER.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jobbot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: jobbot
+    ports:
+      # Host-local only, for psql/pg_dump from the host. Safe to remove —
+      # the bot reaches Postgres over the internal compose network.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobbot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  bot:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://jobbot:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/jobbot
+      HEALTH_HOST: 0.0.0.0
+      HEALTH_PORT: "8080"
+    ports:
+      # Health endpoint, host-local only: curl http://localhost:8080/health
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  pgdata:
