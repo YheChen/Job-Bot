@@ -56,6 +56,25 @@ class Settings(BaseSettings):
     google_pse_api_key: str | None = None
     google_pse_cx: str | None = None
 
+    # --- Listing sources (curated feeds, no search-API quota consumed) ---
+    # SimplifyJobs internship listings.json. Costs one conditional HTTP request
+    # per scan (304 when unchanged), so it is on by default.
+    enable_github_listings: bool = True
+    github_listings_url: str = (
+        "https://raw.githubusercontent.com/SimplifyJobs/Summer2027-Internships/"
+        "dev/.github/scripts/listings.json"
+    )
+    # Only ingest postings posted within this window; 0 disables the cutoff.
+    github_listings_lookback_days: int = 30
+    github_listings_categories: Annotated[list[str], NoDecode] = Field(
+        default=[
+            "Software",
+            "Software Engineering",
+            "AI/ML/Data",
+            "Data Science, AI & Machine Learning",
+        ]
+    )
+
     # --- Quotas / budgets ---
     daily_search_budget: int = 1000
     hourly_search_budget: int = 100
@@ -94,6 +113,15 @@ class Settings(BaseSettings):
     def _split_providers(cls, v: object) -> object:
         if isinstance(v, str):
             return [x.strip() for x in v.replace(",", " ").split() if x.strip()]
+        return v
+
+    @field_validator("github_listings_categories", mode="before")
+    @classmethod
+    def _split_categories(cls, v: object) -> object:
+        # SEMICOLON-separated: category names contain commas
+        # (e.g. "Data Science, AI & Machine Learning").
+        if isinstance(v, str):
+            return [x.strip() for x in v.split(";") if x.strip()]
         return v
 
     @field_validator("database_url")

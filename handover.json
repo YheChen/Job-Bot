@@ -1,7 +1,7 @@
 {
   "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
   "schema_version": "1.0",
-  "last_updated": "2026-08-02",
+  "last_updated": "2026-08-04",
   "project": {
     "name": "jobbot",
     "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
@@ -30,7 +30,7 @@
   ],
   "current_state": {
     "branch": "master (clean)",
-    "tests": "64 passing (pytest); pure logic, no DB/network required",
+    "tests": "104 passing (pytest). Mostly pure logic; tests/test_scan_listings_integration.py runs the real ScanService against in-memory SQLite + httpx.MockTransport (no network).",
     "db_schema": "15 tables, created via alembic upgrade head (migrations/versions/0001_initial.py uses metadata.create_all)",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
     "deployment_status": "NOT yet deployed anywhere — the bot has never made a real Discord connection or real search-API call; everything verified via tests/mocks. First real run = deploying to the ThinkPad (DEPLOY.md Path A).",
@@ -39,8 +39,14 @@
       "#2 Add CI workflow (ruff + pytest + migration smoke) and fix lint",
       "#3 Add pre-commit hooks + enforce formatting in CI",
       "#4 Add handover.json for session/context handover",
-      "#5 Add DEPLOY.md + production compose file"
+      "#5 Add DEPLOY.md + production compose file",
+      "#6 Add SimplifyJobs listings source (+ 2 pipeline bug fixes)"
     ]
+  },
+  "discovery_paths": {
+    "search": "SearchProvider (Serper/Bing/Brave/Google PSE) over generated site: queries — consumes API quota.",
+    "listing_sources": "jobbot/sources/ — curated feeds mapped straight to ExtractedJob, no page fetch, no search quota. SimplifyJobs listings.json enabled by default (ENABLE_GITHUB_LISTINGS), ETag-conditional so an unchanged 11 MB feed costs a 304. Live check 2026-08-04: 489 candidates in a 30-day window, 319 passing the 0.55 gate.",
+    "shared_tail": "Both paths converge on ScanService._ingest (dedup -> score -> persist), then _post_pending (expiration -> poster)."
   },
   "conventions": {
     "ci": ".github/workflows/ci.yml runs on push/PR to master: ruff check, ruff format --check, pytest, and a SQLite alembic upgrade head smoke test.",
@@ -84,13 +90,14 @@
     ]
   },
   "open_items": [
-    "Deploy to the ThinkPad home server via DEPLOY.md Path A (Docker Compose) — this is the first REAL run; watch how extraction/scoring behave on live ATS pages.",
+    "Deploy to the ThinkPad home server via DEPLOY.md Path A (Docker Compose) — this is the first REAL run; watch how extraction/scoring behave on live ATS pages. Consider GITHUB_LISTINGS_LOOKBACK_DAYS=3 for the first scan so the feed backlog does not trickle out 25/scan.",
     "Optional: enable GitHub branch protection on master requiring the 'test' status check (must be toggled in GitHub Settings > Branches; cannot be set via CLI here).",
     "Consider Playwright path for Workday/Oracle/SuccessFactors postings if JSON-LD extraction returns empty over plain HTTP.",
     "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
     "2026-07-14 Initial handover.json created after PRs #1-#3 (SQLite/no-Docker, CI, pre-commit).",
+    "2026-08-04 PR #6: added jobbot/sources/ + SimplifyJobs listings source (ETag-conditional, category/lookback filters, http(s)-only URL guard). Refactored ScanService: extracted shared _ingest() used by both search and feeds; Poster contract now returns {job_id: message_id} of ACTUALLY delivered jobs so the service owns posted-state. Fixed 2 pre-existing bugs the new integration test caught: (1) _touch_existing walked the lazy job.sources relationship -> MissingGreenlet on every duplicate re-discovery; (2) failed Discord sends were marked posted and never retried. Also generalized term parsing (parse_internship_term) which was hardcoded to 2027 and silently dropped 2026/2028 terms.",
     "2026-08-02 PR #5: DEPLOY.md (3 deployment paths + troubleshooting), standalone docker-compose.prod.yml, POSTGRES_PASSWORD in .env.example, README deployment section slimmed to a pointer. Deployment target changed: user bought a ThinkPad T14 (Fedora, dual-boot) as home server, replacing the Oracle VM plan."
   ]
 }
