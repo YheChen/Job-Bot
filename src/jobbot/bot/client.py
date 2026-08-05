@@ -43,19 +43,29 @@ class JobBot(commands.Bot):
     # ------------------------------------------------------------------ #
     # Poster callback used by ScanService.
     # ------------------------------------------------------------------ #
-    async def post_jobs(self, guild_id: int, job_ids: list[int]) -> None:
+    async def post_jobs(self, guild_id: int, job_ids: list[int]) -> dict[int, int]:
+        """Post job embeds; return {job_id: message_id} for those delivered.
+
+        Returning only the successes lets ScanService mark exactly those as
+        posted, so a job that failed to send is retried on the next scan
+        rather than being silently dropped.
+        """
         async with session_scope() as session:
             s = await repo.get_or_create_settings(session, guild_id)
             channel_id = s.post_channel_id
 
         if channel_id is None:
             log.warning("no_post_channel", guild_id=guild_id)
-            return
+            return {}
 
-        channel = self.get_channel(channel_id) or await self.fetch_channel(channel_id)
+        try:
+            channel = self.get_channel(channel_id) or await self.fetch_channel(channel_id)
+        except discord.DiscordException as exc:
+            log.error("post_channel_unreachable", channel_id=channel_id, error=str(exc))
+            return {}
         if channel is None:
             log.warning("post_channel_missing", channel_id=channel_id)
-            return
+            return {}
 
         jobs = await job_service.get_jobs(job_ids)
         message_ids: dict[int, int] = {}
@@ -67,5 +77,5 @@ class JobBot(commands.Bot):
             except discord.DiscordException as exc:
                 log.error("post_failed", job_id=job.id, error=str(exc))
 
-        await job_service.mark_posted(job_ids, message_ids)
         log.info("jobs_posted", guild_id=guild_id, count=len(message_ids))
+        return message_ids

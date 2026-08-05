@@ -33,15 +33,20 @@ from jobbot.expiration.checker import ExpirationChecker
 from jobbot.logging import get_logger
 from jobbot.parsing.extractor import JobExtractor
 from jobbot.parsing.fetcher import PageFetcher
+from jobbot.parsing.term import parse_internship_term
 from jobbot.platforms.registry import PlatformRegistry
 from jobbot.queries.generator import QueryGenConfig, build_queries, select_batch
 from jobbot.scoring.relevance import score_job
 from jobbot.search.manager import SearchManager
+from jobbot.services import job_service
+from jobbot.sources.github_listings import GitHubListingsSource
 
 log = get_logger(__name__)
 
-# poster(guild_id, list_of_job_ids) -> awaitable
-Poster = Callable[[int, list[int]], Awaitable[None]]
+# poster(guild_id, job_ids) -> {job_id: discord_message_id} for jobs actually
+# delivered. Only those are marked posted, so a failed send is retried next
+# scan instead of being silently dropped.
+Poster = Callable[[int, list[int]], Awaitable[dict[int, int]]]
 
 
 class ScanReport(BaseModel):
@@ -51,6 +56,7 @@ class ScanReport(BaseModel):
     results_found: int = 0
     jobs_new: int = 0
     jobs_posted: int = 0
+    listing_candidates: int = 0
 
 
 class ScanService:
@@ -64,6 +70,8 @@ class ScanService:
         self._client = client
         self._poster = poster
         self._scan_counter = 0
+        # Cached across scans so listing sources keep their ETags.
+        self._listing_sources: list | None = None
 
     # ------------------------------------------------------------------ #
     def _build_components(
@@ -79,6 +87,22 @@ class ScanService:
         expiration = ExpirationChecker(registry, fetcher)
         manager = SearchManager.from_settings(self._settings, self._client)
         return registry, extractor, expiration, manager
+
+    def _build_listing_sources(self, registry: PlatformRegistry) -> list:
+        """Curated feeds. Reuses the cached instances so ETags survive scans."""
+        if not self._settings.enable_github_listings:
+            return []
+        if self._listing_sources is None:
+            self._listing_sources = [
+                GitHubListingsSource(
+                    self._client,
+                    url=self._settings.github_listings_url,
+                    categories=self._settings.github_listings_categories,
+                    lookback_days=self._settings.github_listings_lookback_days,
+                    registry=registry,
+                )
+            ]
+        return self._listing_sources
 
     def _query_config(self, settings_row) -> QueryGenConfig:
         enabled = [
@@ -148,6 +172,17 @@ class ScanService:
 
         error: str | None = None
         try:
+            # Curated feeds first: they cost no search quota and give the
+            # highest-quality metadata, so their jobs are already in the DB
+            # (and deduped) before search results arrive.
+            if not platform_filter:
+                seen, new = await self._process_listing_sources(
+                    self._build_listing_sources(registry), min_score
+                )
+                report.results_found += seen
+                report.jobs_new += new
+                report.listing_candidates = seen
+
             for gq in batch:
                 try:
                     found, new, relevant = await self._process_query(
@@ -208,67 +243,15 @@ class ScanService:
             extracted = await extractor.extract(result)
             if extracted is None:
                 continue
-
-            key = dd.dedup_key(extracted)
-            chash = dd.content_hash(extracted)
-            ncompany = dd.normalize_company(extracted.company)
-
-            async with maker() as session:
-                candidates = await repo.candidate_jobs_for_dedup(
-                    session,
-                    dedup_key=key,
-                    platform_slug=extracted.platform_slug,
-                    external_job_id=extracted.external_job_id,
-                    normalized_company=ncompany,
-                    canonical_url=extracted.canonical_url,
-                    content_hash=chash,
-                )
-                existing_like = [
-                    dd.ExistingJobLike(
-                        dedup_key=c.dedup_key,
-                        canonical_url=c.canonical_url,
-                        platform_slug=c.platform_slug,
-                        external_job_id=c.external_job_id,
-                        content_hash=c.content_hash,
-                        normalized_company=c.normalized_company,
-                        title=c.title,
-                        description=c.description,
-                    )
-                    for c in candidates
-                ]
-                match = dd.find_duplicate(extracted, existing_like)
-
-                already_seen = match.is_duplicate
-                scored = score_job(
-                    extracted,
-                    min_score=min_score,
-                    preferred_locations=None,
-                    preferred_terms=None,
-                    already_seen=already_seen,
-                )
-                if scored.is_relevant:
-                    relevant += 1
-
-                if match.is_duplicate:
-                    await self._touch_existing(
-                        session, match.existing_key, extracted, result, query_id, provider
-                    )
-                else:
-                    # Only persist genuine internships (passes gate); skip noise.
-                    if scored.is_internship and scored.is_software and not scored.negatives:
-                        await self._insert_job(
-                            session,
-                            extracted,
-                            scored,
-                            key,
-                            chash,
-                            ncompany,
-                            result,
-                            query_id,
-                            provider,
-                        )
-                        new_jobs += 1
-                await session.commit()
+            was_new, was_relevant = await self._ingest(
+                extracted,
+                min_score=min_score,
+                raw_url=result.url,
+                query_id=query_id,
+                provider=provider,
+            )
+            new_jobs += int(was_new)
+            relevant += int(was_relevant)
 
         async with maker() as session:
             qrow = await session.get(type(query_row), query_id)
@@ -280,21 +263,121 @@ class ScanService:
 
         return len(results), new_jobs, relevant
 
+    # ------------------------------------------------------------------ #
+    async def _ingest(
+        self,
+        extracted,
+        *,
+        min_score: float,
+        raw_url: str,
+        query_id: int | None,
+        provider: str | None,
+    ) -> tuple[bool, bool]:
+        """Dedup, score, and persist one extracted job.
+
+        Shared by the search path and the listing-source path so both get
+        identical duplicate handling and relevance gating. Returns
+        (inserted_new_job, passed_relevance_threshold).
+        """
+        maker = get_sessionmaker()
+        key = dd.dedup_key(extracted)
+        chash = dd.content_hash(extracted)
+        ncompany = dd.normalize_company(extracted.company)
+
+        async with maker() as session:
+            candidates = await repo.candidate_jobs_for_dedup(
+                session,
+                dedup_key=key,
+                platform_slug=extracted.platform_slug,
+                external_job_id=extracted.external_job_id,
+                normalized_company=ncompany,
+                canonical_url=extracted.canonical_url,
+                content_hash=chash,
+            )
+            existing_like = [
+                dd.ExistingJobLike(
+                    dedup_key=c.dedup_key,
+                    canonical_url=c.canonical_url,
+                    platform_slug=c.platform_slug,
+                    external_job_id=c.external_job_id,
+                    content_hash=c.content_hash,
+                    normalized_company=c.normalized_company,
+                    title=c.title,
+                    description=c.description,
+                )
+                for c in candidates
+            ]
+            match = dd.find_duplicate(extracted, existing_like)
+
+            scored = score_job(
+                extracted,
+                min_score=min_score,
+                preferred_locations=None,
+                preferred_terms=None,
+                already_seen=match.is_duplicate,
+            )
+
+            inserted = False
+            if match.is_duplicate:
+                await self._touch_existing(
+                    session, match.existing_key, extracted, raw_url, query_id, provider
+                )
+            elif scored.is_internship and scored.is_software and not scored.negatives:
+                # Only persist genuine internships (passes gate); skip noise.
+                await self._insert_job(
+                    session,
+                    extracted,
+                    scored,
+                    key,
+                    chash,
+                    ncompany,
+                    raw_url,
+                    query_id,
+                    provider,
+                )
+                inserted = True
+            await session.commit()
+
+        return inserted, scored.is_relevant
+
+    async def _process_listing_sources(self, sources: list, min_score: float) -> tuple[int, int]:
+        """Ingest curated feeds. Returns (candidates_seen, new_jobs)."""
+        seen = 0
+        new_jobs = 0
+        for source in sources:
+            try:
+                jobs = await source.fetch()
+            except Exception as exc:  # noqa: BLE001 - one bad feed must not kill the scan
+                log.error("listing_source_failed", source=source.name, error=str(exc))
+                continue
+            seen += len(jobs)
+            for extracted in jobs:
+                try:
+                    was_new, _ = await self._ingest(
+                        extracted,
+                        min_score=min_score,
+                        raw_url=extracted.url,
+                        query_id=None,
+                        provider=source.name,
+                    )
+                    new_jobs += int(was_new)
+                except Exception as exc:  # noqa: BLE001
+                    log.error(
+                        "listing_ingest_failed",
+                        source=source.name,
+                        url=extracted.url,
+                        error=str(exc),
+                    )
+        return seen, new_jobs
+
     async def _insert_job(
-        self, session, extracted, scored, key, chash, ncompany, result, query_id, provider
+        self, session, extracted, scored, key, chash, ncompany, raw_url, query_id, provider
     ) -> None:
         from jobbot.db.models import JobCategory, JobSource
 
-        term = None
-        for t in (extracted.internship_term, extracted.title, extracted.description):
-            if t and "2027" in t:
-                # naive term capture; a fuller parse lives in a follow-up
-                for candidate in ("Summer 2027", "Winter 2027", "Fall 2027", "Spring 2027"):
-                    if candidate.lower() in t.lower():
-                        term = candidate
-                        break
-            if term:
-                break
+        term = parse_internship_term(
+            extracted.internship_term, extracted.title, extracted.description
+        )
 
         job = Job(
             dedup_key=key,
@@ -324,7 +407,7 @@ class ScanService:
             JobSource(
                 job_id=job.id,
                 query_id=query_id,
-                raw_url=result.url,
+                raw_url=raw_url,
                 provider=provider,
             )
         )
@@ -332,7 +415,7 @@ class ScanService:
             session.add(JobCategory(job_id=job.id, category=cat))
 
     async def _touch_existing(
-        self, session, dedup_key_val, extracted, result, query_id, provider
+        self, session, dedup_key_val, extracted, raw_url, query_id, provider
     ) -> None:
         from jobbot.db.models import JobSource
 
@@ -358,14 +441,20 @@ class ScanService:
             if extracted.description:
                 job.description = extracted.description
 
-        # Record the new discovery source if the URL differs.
-        exists = any(s.raw_url == result.url for s in job.sources)
-        if not exists:
+        # Record the new discovery source if the URL differs. Query explicitly
+        # rather than walking job.sources: the lazy relationship would trigger
+        # sync IO under asyncio and raise MissingGreenlet.
+        from sqlalchemy import select
+
+        existing_source = await session.execute(
+            select(JobSource.id).where(JobSource.job_id == job.id, JobSource.raw_url == raw_url)
+        )
+        if existing_source.first() is None:
             session.add(
                 JobSource(
                     job_id=job.id,
                     query_id=query_id,
-                    raw_url=result.url,
+                    raw_url=raw_url,
                     provider=provider,
                 )
             )
@@ -391,10 +480,17 @@ class ScanService:
                 posted_ids.append(job.id)
             await session.commit()
 
-        if posted_ids and self._poster is not None:
-            await self._poster(guild_id, posted_ids)
+        if not posted_ids or self._poster is None:
+            return 0
 
-        return len(posted_ids)
+        delivered = await self._poster(guild_id, posted_ids)
+        # A poster that reports nothing is treated as having delivered nothing,
+        # so the jobs stay pending and are retried on the next scan.
+        if not delivered:
+            return 0
+
+        await job_service.mark_posted(list(delivered.keys()), delivered)
+        return len(delivered)
 
     # ------------------------------------------------------------------ #
     async def recheck_expirations(self, limit: int = 50) -> int:

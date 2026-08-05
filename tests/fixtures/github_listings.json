@@ -1,0 +1,111 @@
+[
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Ginkgo Bioworks",
+    "id": "f19fc366-1b13-4cf5-a10f-75ccd232212d",
+    "title": "Software Intern - Autonomous Lab",
+    "active": true,
+    "terms": [
+      "Winter 2026"
+    ],
+    "date_updated": 1769614520,
+    "date_posted": 1769614520,
+    "url": "https://job-boards.greenhouse.io/ginkgobioworks/jobs/5033167007",
+    "locations": [
+      "Oakland, CA"
+    ],
+    "company_url": "https://simplify.jobs/c/Ginkgo-Bioworks",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "Software",
+    "company_name": "Dryft",
+    "id": "bc6607ea-5320-4f25-8647-3ba280377230",
+    "title": "Full-Stack Engineer Intern",
+    "active": true,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1770275809,
+    "date_posted": 1770275809,
+    "url": "https://jobs.ashbyhq.com/dryft/3f1c261d-9b65-412b-9f17-34b8968bdd78/application",
+    "locations": [
+      "SF"
+    ],
+    "company_url": "https://simplify.jobs/c/Dryft",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "AI/ML/Data",
+    "company_name": "Amazon",
+    "id": "83202c55-8636-4cc2-9b99-1ae2c111a000",
+    "title": "Amazon Robotics \u2013 Applied Scientist 2 Intern / Co-op - 2026",
+    "active": true,
+    "terms": [
+      "Summer 2026",
+      "Spring 2026",
+      "Fall 2026"
+    ],
+    "date_updated": 1765178876,
+    "date_posted": 1765178876,
+    "url": "https://amazon.jobs/en/jobs/3104589/amazon-robotics-applied-scientist-ii-intern-co-op-2026-robotics-manipulation-perception-motion-planning-autonomous-mobile-robots-computer-vision-machine-learning-controls-and-more",
+    "locations": [
+      "Seattle, WA",
+      "Wakefield, MA",
+      "Westborough, MA"
+    ],
+    "company_url": "https://simplify.jobs/c/Amazon",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "Hardware",
+    "company_name": "Base Power",
+    "id": "55f6de1b-c6ba-4ae1-a357-c089a2c549ac",
+    "title": "Firmware Engineer",
+    "active": true,
+    "terms": [
+      "Spring 2026"
+    ],
+    "date_updated": 1765327015,
+    "date_posted": 1765327015,
+    "url": "https://jobs.ashbyhq.com/base-power/a8ee9a66-e90b-42c2-a4a2-28d997c3e8c7/application",
+    "locations": [
+      "Austin, TX"
+    ],
+    "company_url": "https://simplify.jobs/c/Base-Power",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  },
+  {
+    "source": "Simplify",
+    "category": "AI/ML/Data",
+    "company_name": "Samsung Research America",
+    "id": "2b859b30-895c-43a3-9bbb-cf2845fe2ce3",
+    "title": "2026 Summer Research Intern - Digital Health Algorithms",
+    "active": false,
+    "terms": [
+      "Summer 2026"
+    ],
+    "date_updated": 1765222207,
+    "date_posted": 1765222207,
+    "url": "https://job-boards.greenhouse.io/samsungresearchamericainternship/jobs/8321872002",
+    "locations": [
+      "Mountain View, CA"
+    ],
+    "company_url": "https://simplify.jobs/c/Samsung-Research-America",
+    "is_visible": true,
+    "sponsorship": "Other",
+    "degrees": []
+  }
+]

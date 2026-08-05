@@ -26,13 +26,16 @@ feature flags.
 ┌──────────────────────────────────────────────────────────────────────┐
 │                              ScanService                               │
 │  1. pg advisory lock (only one scan at a time)                         │
-│  2. QueryGenerator → prioritized, rotated batch of `site:` queries     │
-│  3. SearchManager → provider (Serper/Bing/Brave/PSE) w/ quota fallback │
-│  4. JobExtractor → canonicalize URL, SSRF-guard, fetch, JSON-LD parse  │
-│  5. DedupDetector → url / job-id / company+title / content-hash / fuzzy│
-│  6. RelevanceScorer → weighted deterministic signals (+ optional LLM)  │
-│  7. ExpirationChecker → HTTP + phrases + validThrough before posting   │
-│  8. persist jobs/sources/versions → poster callback                    │
+│  2a. ListingSources → curated feeds (SimplifyJobs), no quota, no fetch │
+│  2b. QueryGenerator → prioritized, rotated batch of `site:` queries    │
+│      → SearchManager → provider (Serper/Bing/Brave/PSE) w/ fallback    │
+│      → JobExtractor → canonicalize, SSRF-guard, fetch, JSON-LD parse   │
+│  ── both paths converge on the shared _ingest tail ──                  │
+│  3. DedupDetector → url / job-id / company+title / content-hash / fuzzy│
+│  4. RelevanceScorer → weighted deterministic signals (+ optional LLM)  │
+│  5. persist jobs/sources/versions                                      │
+│  6. ExpirationChecker → HTTP + phrases + validThrough before posting   │
+│  7. poster callback → marks only jobs actually delivered               │
 └──────────────────────────────────────────────────────────────────────┘
                                         │ poster(guild_id, job_ids)
                                         ▼
@@ -83,6 +86,7 @@ Job Bot/
 │   ├── env.py
 │   └── versions/0001_initial.py
 ├── src/jobbot/
+│   ├── sources/                    # curated listing feeds (SimplifyJobs)
 │   ├── config.py                   # Pydantic settings + validation
 │   ├── logging.py                  # structlog setup
 │   ├── health.py                   # /health, /ready HTTP endpoint
@@ -208,6 +212,44 @@ the same shape as `serper.py`.
 Adding a platform: subclass `PlatformAdapter` (override `domains`,
 `extract_job_id`, `_company_from_url`) and add it to `PlatformRegistry.default`.
 The base class already handles JSON-LD + Open Graph + `<title>`.
+
+---
+
+## Listing sources
+
+Besides search, the bot ingests **curated feeds** — a second discovery path that
+consumes **no search-API quota**. Feeds carry better metadata than we could
+scrape back off a job page, so records map straight to a job with no page fetch.
+
+Enabled by default: **[SimplifyJobs](https://github.com/SimplifyJobs/Summer2027-Internships)**
+`listings.json` (title, company, locations, terms, `date_posted`, `active`, and a
+direct application URL per posting).
+
+```bash
+ENABLE_GITHUB_LISTINGS=true
+GITHUB_LISTINGS_LOOKBACK_DAYS=30      # 0 = ingest the whole feed
+GITHUB_LISTINGS_CATEGORIES=Software;AI/ML/Data    # semicolon-separated
+```
+
+- **Cheap.** The feed is ~11 MB, so requests are conditional on the previous
+  `ETag`; an unchanged feed costs a 304 and does no work.
+- **Same guarantees as search.** Feed jobs go through the identical dedup,
+  relevance-scoring, expiration, and posting path — a posting found by both the
+  feed and a search query is stored once.
+- **Category is only a pre-filter.** The deterministic scorer remains the
+  authority on what counts as a software internship.
+- **Third-party data is not trusted.** Only `http(s)` URLs are accepted, so a
+  hostile entry can't reach a Discord link button.
+
+> **First run posts a backlog.** With a 30-day lookback the feed yields a few
+> hundred relevant postings. Delivery is capped per scan (25 by default), so the
+> backlog trickles out over several scans rather than flooding the channel. To
+> start with only genuinely new postings, set a small
+> `GITHUB_LISTINGS_LOOKBACK_DAYS` (e.g. `3`) for the first scan.
+
+Add a source by implementing the `ListingSource` protocol (`fetch() ->
+list[ExtractedJob]`) in `jobbot/sources/` and registering it in
+`ScanService._build_listing_sources`.
 
 ---
 
