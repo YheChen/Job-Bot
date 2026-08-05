@@ -22,10 +22,10 @@ test:
 	. .venv/bin/activate && pytest -q
 
 lint:
-	. .venv/bin/activate && ruff check src tests
+	. .venv/bin/activate && ruff check src tests scripts
 
 fmt:
-	. .venv/bin/activate && ruff format src tests
+	. .venv/bin/activate && ruff format src tests scripts
 
 clean:
 	rm -rf .venv .pytest_cache .ruff_cache jobbot.db

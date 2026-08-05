@@ -15,6 +15,7 @@ COPY pyproject.toml ./
 COPY src ./src
 COPY migrations ./migrations
 COPY alembic.ini ./
+COPY scripts ./scripts
 COPY docker/entrypoint.sh ./docker/entrypoint.sh
 
 # The compose stack uses Postgres, so install the postgres extra.
