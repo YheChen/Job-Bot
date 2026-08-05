@@ -28,10 +28,10 @@ jobs:
           pip install ".[dev]"
 
       - name: Lint (ruff)
-        run: ruff check src tests
+        run: ruff check src tests scripts
 
       - name: Format check (ruff)
-        run: ruff format --check src tests
+        run: ruff format --check src tests scripts
 
       - name: Tests (pytest)
         run: pytest -q

@@ -165,6 +165,34 @@ Compose starts Postgres, runs `alembic upgrade head`, then launches the bot.
 
 ---
 
+## Dry run
+
+See exactly what the bot *would* post before letting it near a channel. Writes
+nothing to the database, never connects to Discord, and spends no search-API
+quota by default:
+
+```bash
+python scripts/dry_run.py
+```
+
+It fetches the live listings feed, scores every candidate with the real scorer,
+then prints the jobs that would be delivered (sorted by score) and a tally of
+why the rest were rejected.
+
+```bash
+python scripts/dry_run.py --lookback-days 3 --min-score 0.65
+python scripts/dry_run.py --locations "Toronto,Waterloo,Remote" --terms "Summer 2027"
+python scripts/dry_run.py --queries 2      # also run 2 real search queries (spends quota)
+```
+
+Use it to tune `--min-score`, `--locations`, and `--terms` before applying the
+same values in Discord via `/jobs set-min-score`, `/jobs set-locations`, and
+`/jobs set-terms`. Inside Docker:
+
+```bash
+docker compose -f docker-compose.prod.yml run --rm --no-deps --entrypoint python bot scripts/dry_run.py
+```
+
 ## Tests
 
 Run the suite (no database or network required — the pipeline pieces are pure):
