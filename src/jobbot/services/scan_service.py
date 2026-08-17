@@ -36,7 +36,7 @@ from jobbot.parsing.fetcher import PageFetcher
 from jobbot.parsing.term import parse_internship_term
 from jobbot.platforms.registry import PlatformRegistry
 from jobbot.queries.generator import QueryGenConfig, build_queries, select_batch
-from jobbot.scoring.relevance import score_job
+from jobbot.scoring.relevance import ScoringPrefs, score_job
 from jobbot.search.manager import SearchManager
 from jobbot.services import job_service
 from jobbot.sources.github_listings import GitHubListingsSource
@@ -104,6 +104,21 @@ class ScanService:
             ]
         return self._listing_sources
 
+    @staticmethod
+    def _scoring_prefs(settings_row) -> ScoringPrefs:
+        """Map a guild's saved settings onto the scorer's inputs.
+
+        Everything the /jobs set-* commands persist must appear here, or the
+        setting silently does nothing.
+        """
+        return ScoringPrefs(
+            min_score=settings_row.min_score,
+            locations=list(settings_row.locations or []),
+            terms=list(settings_row.academic_terms or []),
+            negative_keywords=list(settings_row.negative_keywords or []),
+            extra_keywords=list(settings_row.extra_keywords or []),
+        )
+
     def _query_config(self, settings_row) -> QueryGenConfig:
         enabled = [
             slug
@@ -149,7 +164,7 @@ class ScanService:
         async with maker() as session:
             settings_row = await repo.get_or_create_settings(session, guild_id)
             company_domains = list(settings_row.company_domains or [])
-            min_score = settings_row.min_score
+            prefs = self._scoring_prefs(settings_row)
             qconfig = self._query_config(settings_row)
             overrides = await repo.query_priority_overrides(session)
             scan_run = await repo.start_scan_run(
@@ -177,7 +192,7 @@ class ScanService:
             # (and deduped) before search results arrive.
             if not platform_filter:
                 seen, new = await self._process_listing_sources(
-                    self._build_listing_sources(registry), min_score
+                    self._build_listing_sources(registry), prefs
                 )
                 report.results_found += seen
                 report.jobs_new += new
@@ -186,7 +201,7 @@ class ScanService:
             for gq in batch:
                 try:
                     found, new, relevant = await self._process_query(
-                        gq, manager, extractor, min_score, guild_id, scan_run_id
+                        gq, manager, extractor, prefs, guild_id, scan_run_id
                     )
                     report.queries_run += 1
                     report.results_found += found
@@ -194,7 +209,7 @@ class ScanService:
                 except Exception as exc:  # noqa: BLE001 - one bad query shouldn't kill the scan
                     log.error("query_failed", query=gq.text, error=str(exc))
 
-            posted = await self._post_pending(guild_id, min_score, expiration)
+            posted = await self._post_pending(guild_id, prefs.min_score, expiration)
             report.jobs_posted = posted
         except Exception as exc:  # noqa: BLE001
             error = str(exc)
@@ -220,7 +235,7 @@ class ScanService:
 
     # ------------------------------------------------------------------ #
     async def _process_query(
-        self, gq, manager, extractor, min_score, guild_id, scan_run_id
+        self, gq, manager, extractor, prefs: ScoringPrefs, guild_id, scan_run_id
     ) -> tuple[int, int, int]:
         maker = get_sessionmaker()
         results, provider = await manager.search(gq.text)
@@ -245,7 +260,7 @@ class ScanService:
                 continue
             was_new, was_relevant = await self._ingest(
                 extracted,
-                min_score=min_score,
+                prefs=prefs,
                 raw_url=result.url,
                 query_id=query_id,
                 provider=provider,
@@ -268,7 +283,7 @@ class ScanService:
         self,
         extracted,
         *,
-        min_score: float,
+        prefs: ScoringPrefs,
         raw_url: str,
         query_id: int | None,
         provider: str | None,
@@ -311,9 +326,7 @@ class ScanService:
 
             scored = score_job(
                 extracted,
-                min_score=min_score,
-                preferred_locations=None,
-                preferred_terms=None,
+                prefs=prefs,
                 already_seen=match.is_duplicate,
             )
 
@@ -340,7 +353,7 @@ class ScanService:
 
         return inserted, scored.is_relevant
 
-    async def _process_listing_sources(self, sources: list, min_score: float) -> tuple[int, int]:
+    async def _process_listing_sources(self, sources: list, prefs: ScoringPrefs) -> tuple[int, int]:
         """Ingest curated feeds. Returns (candidates_seen, new_jobs)."""
         seen = 0
         new_jobs = 0
@@ -355,7 +368,7 @@ class ScanService:
                 try:
                     was_new, _ = await self._ingest(
                         extracted,
-                        min_score=min_score,
+                        prefs=prefs,
                         raw_url=extracted.url,
                         query_id=None,
                         provider=source.name,
