@@ -148,3 +148,51 @@ async def test_second_scan_does_not_duplicate_or_repost(db, settings):
     assert second.jobs_new == 0, "re-seeing the same feed must not create jobs"
     assert count == first.jobs_new, "no duplicate rows"
     assert posted == posted_after_first, "already-posted jobs must not repost"
+
+
+async def test_guild_settings_reach_the_scorer(db, settings):
+    """Regression: ScanService passed preferred_locations/terms=None to score_job,
+    so /jobs set-locations and /jobs set-terms had no effect on ranking and no
+    score could exceed 0.82. This asserts the plumbing, not the scorer."""
+    from jobbot.services import settings_service
+
+    # Matches the Ginkgo fixture: Oakland, CA / Winter 2026.
+    await settings_service.set_locations(1, "Oakland")
+    await settings_service.set_terms(1, "Winter 2026")
+    await settings_service.set_min_score(1, 0.1)
+
+    async def poster(guild_id: int, job_ids: list[int]) -> dict[int, int]:
+        return {jid: 1000 + jid for jid in job_ids}
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(_handler)) as client:
+        await ScanService(settings, client, poster=poster).run_scan(guild_id=1, triggered_by="test")
+
+    maker = get_sessionmaker()
+    async with maker() as session:
+        ginkgo = (
+            await session.execute(select(Job).where(Job.company == "Ginkgo Bioworks"))
+        ).scalar_one()
+
+    assert "location" in ginkgo.score_breakdown, "preferred locations never reached the scorer"
+    assert "term" in ginkgo.score_breakdown, "preferred terms never reached the scorer"
+    assert ginkgo.relevance_score > 0.82, "score still capped at the no-prefs ceiling"
+
+
+async def test_guild_negative_keywords_reach_the_scorer(db, settings):
+    """Regression: /jobs set-negative-keywords was persisted but never applied."""
+    from jobbot.services import settings_service
+
+    await settings_service.set_negative_keywords(1, "autonomous lab")
+
+    async def poster(guild_id: int, job_ids: list[int]) -> dict[int, int]:
+        return {jid: 1000 + jid for jid in job_ids}
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(_handler)) as client:
+        await ScanService(settings, client, poster=poster).run_scan(guild_id=1, triggered_by="test")
+
+    maker = get_sessionmaker()
+    async with maker() as session:
+        titles = {j.title for j in (await session.execute(select(Job))).scalars()}
+
+    assert "Software Intern - Autonomous Lab" not in titles, "negative keyword not applied"
+    assert "Full-Stack Engineer Intern" in titles, "unrelated jobs must still pass"

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 from jobbot.parsing.models import ExtractedJob
-from jobbot.scoring.relevance import score_job
+from jobbot.scoring.relevance import ScoringPrefs, score_job
 
 NOW = datetime(2026, 7, 14, tzinfo=UTC)
 
@@ -102,3 +102,62 @@ def test_freshness_decreases_with_age():
 def test_categories_detected():
     r = score_job(_job("Machine Learning Intern", desc="ML engineer role"), now=NOW)
     assert "machine_learning" in r.categories
+
+
+# --- ScoringPrefs plumbing (regression: guild settings never reached the scorer) --- #
+def test_prefs_apply_location_and_term_bonuses():
+    """Regression: locations/terms were passed as None, capping every score at 0.82."""
+    job = _job("Software Engineer Intern Summer 2027", location="Toronto, ON", posted=NOW)
+    without = score_job(job, now=NOW)
+    with_prefs = score_job(
+        job,
+        prefs=ScoringPrefs(locations=["Toronto"], terms=["Summer 2027"]),
+        now=NOW,
+    )
+    assert with_prefs.score > without.score
+    # The two dead signals are worth 0.18 combined; without them nothing can top 0.82.
+    assert without.score <= 0.82
+    assert with_prefs.score > 0.82
+    assert "location" in with_prefs.breakdown
+    assert "term" in with_prefs.breakdown
+
+
+def test_prefs_negative_keywords_are_applied():
+    """Regression: /jobs set-negative-keywords was stored but never read."""
+    job = _job("Business Systems Analyst Intern", desc="software systems", posted=NOW)
+    assert score_job(job, now=NOW).is_relevant
+    filtered = score_job(
+        job, prefs=ScoringPrefs(negative_keywords=["business systems analyst"]), now=NOW
+    )
+    assert not filtered.is_relevant
+    assert "business systems analyst" in filtered.negatives
+
+
+def test_prefs_extra_keywords_widen_the_software_gate():
+    job = _job("Compiler Intern", desc="work on our toolchain", posted=NOW)
+    assert not score_job(job, now=NOW).is_software
+    widened = score_job(job, prefs=ScoringPrefs(extra_keywords=["compiler"]), now=NOW)
+    assert widened.is_software
+    assert widened.is_relevant
+
+
+def test_prefs_min_score_is_used():
+    job = _job("Software Engineer Intern", posted=NOW - timedelta(days=60))
+    assert score_job(job, prefs=ScoringPrefs(min_score=0.99), now=NOW).is_relevant is False
+    assert score_job(job, prefs=ScoringPrefs(min_score=0.1), now=NOW).is_relevant is True
+
+
+def test_explicit_kwargs_still_override_prefs():
+    job = _job("Software Engineer Intern", location="Toronto", posted=NOW)
+    result = score_job(
+        job,
+        prefs=ScoringPrefs(locations=["Vancouver"]),
+        preferred_locations=["Toronto"],
+        now=NOW,
+    )
+    assert "location" in result.breakdown  # explicit arg won
+
+
+def test_empty_prefs_change_nothing():
+    job = _job("Software Engineer Intern", posted=NOW)
+    assert score_job(job, now=NOW).score == score_job(job, prefs=ScoringPrefs(), now=NOW).score

@@ -53,6 +53,21 @@ class RelevanceResult(BaseModel):
     reasons: list[str] = Field(default_factory=list)
 
 
+class ScoringPrefs(BaseModel):
+    """Per-guild scoring preferences, as edited by the /jobs set-* commands.
+
+    Bundled into one object so callers cannot thread the threshold through
+    while silently dropping the rest — which is exactly how locations, terms
+    and negative keywords ended up unused in production.
+    """
+
+    min_score: float = 0.55
+    locations: list[str] = Field(default_factory=list)
+    terms: list[str] = Field(default_factory=list)
+    negative_keywords: list[str] = Field(default_factory=list)
+    extra_keywords: list[str] = Field(default_factory=list)
+
+
 def _detect_categories(text: str) -> list[str]:
     cats: list[str] = []
     for cat, kws in CATEGORY_KEYWORDS.items():
@@ -85,13 +100,29 @@ def score_job(
     preferred_locations: list[str] | None = None,
     preferred_terms: list[str] | None = None,
     extra_negative_keywords: list[str] | None = None,
+    extra_software_keywords: list[str] | None = None,
     already_seen: bool = False,
     now: datetime | None = None,
+    prefs: ScoringPrefs | None = None,
 ) -> RelevanceResult:
+    """Score a job. Pass `prefs` to apply a guild's saved preferences.
+
+    `prefs` is a convenience wrapper: any explicit keyword argument still wins,
+    so existing call sites and tests keep their behaviour.
+    """
+    if prefs is not None:
+        if min_score == 0.55:
+            min_score = prefs.min_score
+        preferred_locations = preferred_locations or prefs.locations
+        preferred_terms = preferred_terms or prefs.terms
+        extra_negative_keywords = extra_negative_keywords or prefs.negative_keywords
+        extra_software_keywords = extra_software_keywords or prefs.extra_keywords
+
     now = now or datetime.now(UTC)
     preferred_locations = [loc.lower() for loc in (preferred_locations or [])]
     preferred_terms = [t.lower() for t in (preferred_terms or [])]
     negatives_extra = [k.lower() for k in (extra_negative_keywords or [])]
+    software_extra = [k.lower() for k in (extra_software_keywords or [])]
 
     haystack = " ".join(
         filter(
@@ -106,7 +137,9 @@ def score_job(
 
     # --- gates ------------------------------------------------------------
     intern_hits = contains_any(haystack, INTERNSHIP_INDICATORS)
-    sw_hits = contains_any(haystack, SOFTWARE_INDICATORS)
+    # Guild-configured keywords widen the software signal (e.g. "rust",
+    # "compilers"); empty by default, so this is a no-op unless configured.
+    sw_hits = contains_any(haystack, SOFTWARE_INDICATORS) + contains_any(haystack, software_extra)
     is_internship = bool(intern_hits)
     is_software = bool(sw_hits)
 
