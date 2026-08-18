@@ -243,6 +243,36 @@ The base class already handles JSON-LD + Open Graph + `<title>`.
 
 ---
 
+## Location filtering
+
+`locations` works in two modes:
+
+```text
+/jobs set-locations locations:"Bay Area, Toronto, Seattle, NYC, Redmond" required:True
+```
+
+- `required:False` (default) — matching locations get a **scoring bonus** and
+  rank higher; everything else still posts.
+- `required:True` — **only** those locations pass. Non-matching jobs are
+  rejected at ingest, so they never reach the database or Discord.
+
+Matching is **alias-aware** (`scoring/locations.py`), because postings spell
+places many ways. Configuring `Bay Area` also matches SF, Palo Alto, Mountain
+View, Sunnyvale, Santa Clara, Menlo Park, Cupertino, Redwood City, Foster City,
+San Mateo, San Jose, Oakland and Berkeley. `Toronto` covers Mississauga,
+Markham and North York; `Seattle` covers Bellevue and Kirkland; `NYC` covers
+Manhattan and Brooklyn.
+
+Bare state/province codes are deliberately **not** aliases — `Ontario, CA` is in
+California and `Spokane, WA` is not Seattle, and both are correctly rejected.
+
+`Remote` is opt-in: add it to the list to include remote roles. A location the
+alias table doesn't know (e.g. `Austin`) is matched literally, so nothing you
+type is silently ignored. If a posting has no location field, the title is used
+as a fallback; a posting with no location hint at all is filtered out.
+
+---
+
 ## Platform priority
 
 Not every ATS is equally pleasant to apply through: Ashby/Greenhouse/Lever take

@@ -25,11 +25,16 @@ async def set_interval(guild_id: int, hours: float) -> None:
         s.scan_interval_hours = max(0.5, hours)
 
 
-async def set_locations(guild_id: int, locations: str) -> list[str]:
+async def set_locations(
+    guild_id: int, locations: str, required: bool | None = None
+) -> tuple[list[str], bool]:
+    """Set preferred locations. `required` turns them into a hard filter."""
     async with session_scope() as session:
         s = await repo.get_or_create_settings(session, guild_id)
         s.locations = _parse_list(locations)
-        return s.locations
+        if required is not None:
+            s.require_location = required
+        return s.locations, s.require_location
 
 
 async def set_terms(guild_id: int, terms: str) -> list[str]:

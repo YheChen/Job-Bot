@@ -196,3 +196,46 @@ async def test_guild_negative_keywords_reach_the_scorer(db, settings):
 
     assert "Software Intern - Autonomous Lab" not in titles, "negative keyword not applied"
     assert "Full-Stack Engineer Intern" in titles, "unrelated jobs must still pass"
+
+
+async def test_require_location_filters_at_ingest(db, settings):
+    """A filtered-out job must never reach the database, not just skip posting."""
+    from jobbot.services import settings_service
+
+    # Fixture locations: Oakland CA (bay area), SF (bay area), Seattle WA.
+    await settings_service.set_locations(1, "Toronto", required=True)
+
+    async def poster(guild_id: int, job_ids: list[int]) -> dict[int, int]:
+        return {jid: 1000 + jid for jid in job_ids}
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(_handler)) as client:
+        report = await ScanService(settings, client, poster=poster).run_scan(
+            guild_id=1, triggered_by="test"
+        )
+
+    maker = get_sessionmaker()
+    async with maker() as session:
+        jobs = list((await session.execute(select(Job))).scalars())
+
+    assert report.listing_candidates == 3, "candidates are still fetched"
+    assert jobs == [], "none of the fixture jobs are in Toronto"
+    assert report.jobs_new == 0
+
+
+async def test_require_location_keeps_matching_jobs(db, settings):
+    from jobbot.services import settings_service
+
+    await settings_service.set_locations(1, "Bay Area", required=True)
+
+    async def poster(guild_id: int, job_ids: list[int]) -> dict[int, int]:
+        return {jid: 1000 + jid for jid in job_ids}
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(_handler)) as client:
+        await ScanService(settings, client, poster=poster).run_scan(guild_id=1, triggered_by="test")
+
+    maker = get_sessionmaker()
+    async with maker() as session:
+        locations = {j.location for j in (await session.execute(select(Job))).scalars()}
+
+    # Ginkgo is Oakland, CA and Dryft is SF — both Bay Area aliases.
+    assert locations == {"Oakland, CA", "SF"}

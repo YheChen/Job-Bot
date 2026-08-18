@@ -24,6 +24,7 @@ from jobbot.scoring.keywords import (
     SOFTWARE_INDICATORS,
     contains_any,
 )
+from jobbot.scoring.locations import match_location
 from jobbot.scoring.platform_prefs import is_direct_ats, platform_factor
 
 # Weights sum defines the normalization denominator for positive signals.
@@ -55,6 +56,9 @@ class RelevanceResult(BaseModel):
     categories: list[str] = Field(default_factory=list)
     breakdown: dict[str, float] = Field(default_factory=dict)
     reasons: list[str] = Field(default_factory=list)
+    # False only when a location filter is active and the job is elsewhere.
+    location_ok: bool = True
+    matched_location: str | None = None
 
 
 class ScoringPrefs(BaseModel):
@@ -73,6 +77,8 @@ class ScoringPrefs(BaseModel):
     # Empty means "use the built-in tiers" (see scoring/platform_prefs.py).
     preferred_platforms: list[str] = Field(default_factory=list)
     deprioritized_platforms: list[str] = Field(default_factory=list)
+    # When True, `locations` becomes a hard filter instead of a scoring bonus.
+    require_location: bool = False
 
 
 def _detect_categories(text: str) -> list[str]:
@@ -110,6 +116,7 @@ def score_job(
     extra_software_keywords: list[str] | None = None,
     preferred_platforms: list[str] | None = None,
     deprioritized_platforms: list[str] | None = None,
+    require_location: bool = False,
     already_seen: bool = False,
     now: datetime | None = None,
     prefs: ScoringPrefs | None = None,
@@ -128,6 +135,7 @@ def score_job(
         extra_software_keywords = extra_software_keywords or prefs.extra_keywords
         preferred_platforms = preferred_platforms or prefs.preferred_platforms
         deprioritized_platforms = deprioritized_platforms or prefs.deprioritized_platforms
+        require_location = require_location or prefs.require_location
 
     now = now or datetime.now(UTC)
     preferred_locations = [loc.lower() for loc in (preferred_locations or [])]
@@ -206,13 +214,15 @@ def score_job(
         breakdown["term"] = _W["term"]
         matched += matched_terms
 
-    # Location match
-    loc_source = " ".join(filter(None, [job.location, job.title, job.description])).lower()
-    matched_locs = [loc for loc in preferred_locations if loc in loc_source]
-    if matched_locs:
+    # Location match. Alias-aware, so configuring "bay area" also matches
+    # "SF", "Palo Alto", "Sunnyvale", etc. Prefer the structured location
+    # field; fall back to the title when a posting has no location at all.
+    loc_source = job.location or " ".join(filter(None, [job.title, job.description]))
+    matched_location = match_location(loc_source, preferred_locations)
+    if matched_location:
         score += _W["location"]
         breakdown["location"] = _W["location"]
-        matched += matched_locs
+        matched.append(matched_location)
 
     # Direct ATS link (not an aggregator / generic company page)
     if is_direct_ats(job.platform_slug):
@@ -246,8 +256,13 @@ def score_job(
 
     score = max(0.0, min(1.0, score))
 
+    # Optional hard location filter: "only these metros" rather than a bonus.
+    location_ok = (not require_location) or bool(matched_location)
+    if not location_ok:
+        reasons.append(f"location not in allowed set: {job.location or '(unknown)'}")
+
     # Hard gate: must be both an internship and software to ever pass.
-    passes_gate = is_internship and is_software and not negatives
+    passes_gate = is_internship and is_software and not negatives and location_ok
     is_relevant = passes_gate and score >= min_score
 
     categories = _detect_categories(haystack) if passes_gate else []
@@ -262,4 +277,6 @@ def score_job(
         categories=categories,
         breakdown=breakdown,
         reasons=reasons,
+        location_ok=location_ok,
+        matched_location=matched_location,
     )
