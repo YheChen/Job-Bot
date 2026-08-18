@@ -75,6 +75,15 @@ class Settings(BaseSettings):
         ]
     )
 
+    # --- GitHub README publishing (off by default: writes to a public repo) ---
+    enable_github_publish: bool = False
+    github_publish_token: str | None = None
+    github_publish_repo: str | None = None  # "owner/name"
+    github_publish_path: str = "README.md"
+    github_publish_branch: str = "main"
+    github_publish_title: str = "Software Engineering Internships"
+    github_publish_limit: int = 200
+
     # --- Quotas / budgets ---
     daily_search_budget: int = 1000
     hourly_search_budget: int = 100
@@ -157,6 +166,12 @@ class Settings(BaseSettings):
                 )
         if self.enable_llm_classification and not self.anthropic_api_key:
             raise ValueError("enable_llm_classification=True requires anthropic_api_key")
+        if self.enable_github_publish and not (
+            self.github_publish_token and self.github_publish_repo
+        ):
+            raise ValueError(
+                "enable_github_publish=True requires github_publish_token and github_publish_repo"
+            )
         return self
 
     @property

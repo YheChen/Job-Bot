@@ -35,6 +35,7 @@ from jobbot.parsing.extractor import JobExtractor
 from jobbot.parsing.fetcher import PageFetcher
 from jobbot.parsing.term import parse_internship_term
 from jobbot.platforms.registry import PlatformRegistry
+from jobbot.publishers.github_readme import GitHubReadmePublisher
 from jobbot.queries.generator import QueryGenConfig, build_queries, select_batch
 from jobbot.scoring.relevance import ScoringPrefs, score_job
 from jobbot.search.manager import SearchManager
@@ -57,6 +58,7 @@ class ScanReport(BaseModel):
     jobs_new: int = 0
     jobs_posted: int = 0
     listing_candidates: int = 0
+    published: bool = False
 
 
 class ScanService:
@@ -72,6 +74,7 @@ class ScanService:
         self._scan_counter = 0
         # Cached across scans so listing sources keep their ETags.
         self._listing_sources: list | None = None
+        self._publishers: list | None = None
 
     # ------------------------------------------------------------------ #
     def _build_components(
@@ -213,6 +216,7 @@ class ScanService:
 
             posted = await self._post_pending(guild_id, prefs.min_score, expiration)
             report.jobs_posted = posted
+            report.published = await self._publish(prefs.min_score)
         except Exception as exc:  # noqa: BLE001
             error = str(exc)
             log.error("scan_failed", error=error)
@@ -526,3 +530,45 @@ class ScanService:
             await session.commit()
         log.info("expiration_recheck", checked=len(jobs), marked=marked)
         return marked
+
+    # ------------------------------------------------------------------ #
+    def _build_publishers(self) -> list:
+        """External listing destinations. Empty unless explicitly configured."""
+        if not self._settings.enable_github_publish:
+            return []
+        if self._publishers is None:
+            try:
+                self._publishers = [
+                    GitHubReadmePublisher(
+                        self._client,
+                        token=self._settings.github_publish_token,
+                        repo=self._settings.github_publish_repo,
+                        path=self._settings.github_publish_path,
+                        branch=self._settings.github_publish_branch,
+                        title=self._settings.github_publish_title,
+                    )
+                ]
+            except ValueError as exc:
+                log.error("publisher_config_invalid", error=str(exc))
+                self._publishers = []
+        return self._publishers
+
+    async def _publish(self, min_score: float) -> bool:
+        """Mirror the open listing to external destinations. Never raises."""
+        publishers = self._build_publishers()
+        if not publishers:
+            return False
+
+        maker = get_sessionmaker()
+        async with maker() as session:
+            jobs = await repo.jobs_for_publication(
+                session, min_score, limit=self._settings.github_publish_limit
+            )
+
+        wrote = False
+        for publisher in publishers:
+            try:
+                wrote |= await publisher.publish(jobs)
+            except Exception as exc:  # noqa: BLE001 - publishing must not abort a scan
+                log.error("publish_error", publisher=publisher.name, error=str(exc))
+        return wrote
