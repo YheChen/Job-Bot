@@ -85,6 +85,9 @@ class GuildSettings(Base, TimestampMixin):
     negative_keywords: Mapped[list] = mapped_column(JSON, default=list)
     company_domains: Mapped[list] = mapped_column(JSON, default=list)
     disabled_platforms: Mapped[list] = mapped_column(JSON, default=list)
+    # Platform ranking preferences; empty lists mean "use the built-in tiers".
+    preferred_platforms: Mapped[list] = mapped_column(JSON, default=list)
+    deprioritized_platforms: Mapped[list] = mapped_column(JSON, default=list)
 
     guild: Mapped[Guild] = relationship(back_populates="settings")
 

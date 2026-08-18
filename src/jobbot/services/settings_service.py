@@ -93,3 +93,16 @@ async def set_paused(guild_id: int, paused: bool) -> None:
     async with session_scope() as session:
         s = await repo.get_or_create_settings(session, guild_id)
         s.paused = paused
+
+
+async def set_platform_priority(
+    guild_id: int, preferred: str | None = None, deprioritized: str | None = None
+) -> tuple[list[str], list[str]]:
+    """Set platform ranking tiers. Empty string clears a list (back to defaults)."""
+    async with session_scope() as session:
+        s = await repo.get_or_create_settings(session, guild_id)
+        if preferred is not None:
+            s.preferred_platforms = [p.lower() for p in _parse_list(preferred)]
+        if deprioritized is not None:
+            s.deprioritized_platforms = [p.lower() for p in _parse_list(deprioritized)]
+        return s.preferred_platforms, s.deprioritized_platforms

@@ -117,6 +117,8 @@ class ScanService:
             terms=list(settings_row.academic_terms or []),
             negative_keywords=list(settings_row.negative_keywords or []),
             extra_keywords=list(settings_row.extra_keywords or []),
+            preferred_platforms=list(settings_row.preferred_platforms or []),
+            deprioritized_platforms=list(settings_row.deprioritized_platforms or []),
         )
 
     def _query_config(self, settings_row) -> QueryGenConfig:

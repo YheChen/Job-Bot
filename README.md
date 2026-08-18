@@ -243,6 +243,39 @@ The base class already handles JSON-LD + Open Graph + `<title>`.
 
 ---
 
+## Platform priority
+
+Not every ATS is equally pleasant to apply through: Ashby/Greenhouse/Lever take
+a couple of minutes, while Workday and Oracle usually want an account and a
+multi-page form. The scorer grades the hosting platform so equivalent postings
+rank by how painful the application is.
+
+Default tiers (`scoring/platform_prefs.py`):
+
+| Tier | Platforms | Effect |
+|---|---|---|
+| Preferred | ashby, greenhouse, lever, workable, smartrecruiters | full bonus |
+| Neutral | any other recognized ATS (jobvite, bamboohr, recruitee, …) | half bonus |
+| Deprioritized | workday, oracle, successfactors, icims, adp | no bonus |
+
+Override per server:
+
+```text
+/jobs set-platform-priority preferred:"ashby,greenhouse,lever" deprioritized:"workday,oracle"
+```
+
+Supplying a list *replaces* that tier's defaults rather than adding to it, and
+an explicit entry always beats the built-in tiers — so deprioritizing `ashby`
+works even though it ships as preferred. Leave a field blank to restore
+defaults.
+
+This is **ranking, not filtering**: deprioritized postings are still scored,
+deduped and posted, they just sort lower and therefore land later given the
+per-scan delivery cap. To stop searching a platform entirely, use
+`/jobs disable-platform`.
+
+---
+
 ## Listing sources
 
 Besides search, the bot ingests **curated feeds** — a second discovery path that
@@ -287,6 +320,7 @@ list[ExtractedJob]`) in `jobbot/sources/` and registering it in
 `/jobs queries`, `/jobs companies`, `/jobs saved`, `/jobs status`, `/jobs scan`.
 
 **Admins / bot-manager roles only:** `/jobs set-channel`, `/jobs set-interval`,
+`/jobs set-platform-priority`,
 `/jobs set-locations`, `/jobs set-terms`, `/jobs set-keywords`,
 `/jobs set-negative-keywords`, `/jobs set-min-score`, `/jobs enable-platform`,
 `/jobs disable-platform`, `/jobs add-company-domain`, `/jobs remove-company-domain`,
