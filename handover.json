@@ -30,7 +30,7 @@
   ],
   "current_state": {
     "branch": "master (clean)",
-    "tests": "136 passing (pytest); unit + integration, no network required",
+    "tests": "176 passing (pytest); unit + integration, no network required",
     "db_schema": "15 tables. 0001_initial uses metadata.create_all (NOT a frozen snapshot); 0002 adds the platform-priority columns and is idempotent-by-inspection to survive both fresh and existing databases.",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
     "deployment_status": "LIVE on the ThinkPad since 2026-08-08 (docker-compose.prod.yml). Scans run every 6h and the pipeline works; the post channel was unset until 2026-08-17, so ~684 jobs queued up unposted. Delivery is capped at 25/scan.",
@@ -43,13 +43,15 @@
       "#6 Add SimplifyJobs listings source (+ 2 pipeline bug fixes)",
       "#7 Add scripts/dry_run.py to preview what would be posted",
       "#8 Apply guild settings to relevance scoring",
-      "#9 Rank ATS platforms by application friction"
+      "#9 Rank ATS platforms by application friction",
+      "#10 Publish listings to a GitHub README"
     ]
   },
   "discovery_paths": {
     "search": "SearchProvider (Serper/Bing/Brave/Google PSE) over generated site: queries \u2014 consumes API quota.",
     "listing_sources": "jobbot/sources/ \u2014 curated feeds mapped straight to ExtractedJob, no page fetch, no search quota. SimplifyJobs listings.json enabled by default (ENABLE_GITHUB_LISTINGS), ETag-conditional so an unchanged 11 MB feed costs a 304. Live check 2026-08-04: 489 candidates in a 30-day window, 319 passing the 0.55 gate.",
-    "shared_tail": "Both paths converge on ScanService._ingest (dedup -> score -> persist), then _post_pending (expiration -> poster)."
+    "shared_tail": "Both paths converge on ScanService._ingest (dedup -> score -> persist), then _post_pending (expiration -> poster).",
+    "publishing": "jobbot/publishers/ \u2014 optional mirror of the open listing to a GitHub repo README via the Contents API (ENABLE_GITHUB_PUBLISH, off by default). Change detection uses a content-hash marker embedded in the file that excludes the timestamp, so an unchanged listing makes no commit. All cell values are escaped because feed data is published publicly."
   },
   "conventions": {
     "ci": ".github/workflows/ci.yml runs on push/PR to master: ruff check, ruff format --check, pytest, and a SQLite alembic upgrade head smoke test.",
@@ -104,6 +106,7 @@
     "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
+    "2026-08-17 PR #10: GitHub README publishing (jobbot/publishers/). Renders open jobs as a Markdown table and commits via the GitHub Contents API after each scan; off unless ENABLE_GITHUB_PUBLISH + token + repo are set. Tests caught three holes in the first implementation: repo slug '../evil' passed validation (path traversal into the API path), '/abs/path' passed path validation, and backslash-escaping '<' was weaker than entity-encoding \u2014 all fixed in source.",
     "2026-08-17 PR #9: platform priority. Scorer now grades the hosting ATS (new platform_pref weight 0.10) instead of giving every ATS a flat bonus: ashby/greenhouse/lever/workable/smartrecruiters full, other known ATS half, workday/oracle/successfactors/icims/adp none. Configurable per guild via /jobs set-platform-priority (new guild_settings columns + migration 0002). NOTE 0002 is idempotent-by-inspection because 0001_initial uses metadata.create_all and therefore already creates new columns on a FRESH db while an existing db lacks them \u2014 every future additive migration needs the same treatment until 0001 is frozen to an explicit schema.",
     "2026-07-14 Initial handover.json created after PRs #1-#3 (SQLite/no-Docker, CI, pre-commit).",
     "2026-08-17 PR #8: fixed guild settings never reaching the scorer. ScanService called score_job(preferred_locations=None, preferred_terms=None) and never passed negative_keywords/extra_keywords at all, so /jobs set-locations, set-terms, set-negative-keywords and set-keywords had ZERO effect on ranking and no job could score above 0.82 (= 1.00 - 0.10 term - 0.08 location; confirmed in production where max_score was exactly 0.82). Introduced ScoringPrefs bundling all four settings so a caller cannot thread the threshold while dropping the rest; added extra_software_keywords to widen the software gate via /jobs set-keywords. Regression tests at BOTH layers (unit + integration) \u2014 the integration ones verified to fail without the fix.",

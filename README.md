@@ -276,6 +276,44 @@ per-scan delivery cap. To stop searching a platform entirely, use
 
 ---
 
+## Publishing to a GitHub README
+
+The bot can mirror its open listings into a Markdown table in a GitHub repo,
+in the style of the SimplifyJobs internship READMEs. **Off by default** — it
+writes public content, so it only runs once you configure it.
+
+```bash
+ENABLE_GITHUB_PUBLISH=true
+GITHUB_PUBLISH_TOKEN=github_pat_...   # fine-grained PAT, Contents: Read and write
+GITHUB_PUBLISH_REPO=you/your-internships-repo
+GITHUB_PUBLISH_PATH=README.md
+GITHUB_PUBLISH_BRANCH=main
+GITHUB_PUBLISH_LIMIT=200
+```
+
+Create the target repository yourself first. Scope the token to **only** that
+repo — it is a write credential.
+
+After each scan the bot renders the open, above-threshold jobs (newest first)
+and commits via the GitHub Contents API — no git binary, no clone, no
+credentials on disk.
+
+- **No commit churn.** The document embeds a content-hash marker covering the
+  table rows but *not* the "last updated" line, so an unchanged listing costs
+  one GET and produces no commit.
+- **Untrusted input is escaped.** Titles and company names come from
+  third-party feeds and land on a public page, so pipes, newlines, control
+  characters, Markdown syntax and angle brackets are all neutralized, and only
+  `http(s)` links are emitted.
+- **Best effort.** A bad token, a missing repo, or a network failure is logged
+  and skipped — publishing never aborts a scan.
+
+Add another destination by implementing the `Publisher` protocol
+(`publish(jobs) -> bool`) in `jobbot/publishers/` and registering it in
+`ScanService._build_publishers`.
+
+---
+
 ## Listing sources
 
 Besides search, the bot ingests **curated feeds** — a second discovery path that

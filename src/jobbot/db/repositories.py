@@ -172,6 +172,19 @@ async def jobs_pending_post(session: AsyncSession, min_score: float, limit: int 
     return list(rows.scalars())
 
 
+async def jobs_for_publication(
+    session: AsyncSession, min_score: float, limit: int = 200
+) -> list[Job]:
+    """Open, relevant jobs for an external listing, newest first."""
+    rows = await session.execute(
+        select(Job)
+        .where(Job.status == JobStatus.active, Job.relevance_score >= min_score)
+        .order_by(Job.first_seen_at.desc(), Job.relevance_score.desc())
+        .limit(limit)
+    )
+    return list(rows.scalars())
+
+
 async def jobs_to_recheck(
     session: AsyncSession, older_than_hours: float, limit: int = 50
 ) -> list[Job]:
