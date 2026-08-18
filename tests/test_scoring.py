@@ -114,12 +114,13 @@ def test_prefs_apply_location_and_term_bonuses():
         prefs=ScoringPrefs(locations=["Toronto"], terms=["Summer 2027"]),
         now=NOW,
     )
-    assert with_prefs.score > without.score
-    # The two dead signals are worth 0.18 combined; without them nothing can top 0.82.
-    assert without.score <= 0.82
-    assert with_prefs.score > 0.82
+    # Assert the signals fire, not a magic total: the weight table (and so the
+    # achievable maximum) changes whenever a new signal is added.
+    assert "location" not in without.breakdown
+    assert "term" not in without.breakdown
     assert "location" in with_prefs.breakdown
     assert "term" in with_prefs.breakdown
+    assert with_prefs.score > without.score
 
 
 def test_prefs_negative_keywords_are_applied():

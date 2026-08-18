@@ -24,6 +24,7 @@ from jobbot.scoring.keywords import (
     SOFTWARE_INDICATORS,
     contains_any,
 )
+from jobbot.scoring.platform_prefs import is_direct_ats, platform_factor
 
 # Weights sum defines the normalization denominator for positive signals.
 _W = {
@@ -33,6 +34,9 @@ _W = {
     "term": 0.10,
     "location": 0.08,
     "ats": 0.07,
+    # How pleasant the hosting ATS is to apply through (Ashby/Greenhouse vs
+    # Workday). Separate from "ats" so the direct-link signal keeps its meaning.
+    "platform_pref": 0.10,
     "freshness": 0.10,
 }
 _MAX_POSITIVE = sum(_W.values())
@@ -66,6 +70,9 @@ class ScoringPrefs(BaseModel):
     terms: list[str] = Field(default_factory=list)
     negative_keywords: list[str] = Field(default_factory=list)
     extra_keywords: list[str] = Field(default_factory=list)
+    # Empty means "use the built-in tiers" (see scoring/platform_prefs.py).
+    preferred_platforms: list[str] = Field(default_factory=list)
+    deprioritized_platforms: list[str] = Field(default_factory=list)
 
 
 def _detect_categories(text: str) -> list[str]:
@@ -101,6 +108,8 @@ def score_job(
     preferred_terms: list[str] | None = None,
     extra_negative_keywords: list[str] | None = None,
     extra_software_keywords: list[str] | None = None,
+    preferred_platforms: list[str] | None = None,
+    deprioritized_platforms: list[str] | None = None,
     already_seen: bool = False,
     now: datetime | None = None,
     prefs: ScoringPrefs | None = None,
@@ -117,6 +126,8 @@ def score_job(
         preferred_terms = preferred_terms or prefs.terms
         extra_negative_keywords = extra_negative_keywords or prefs.negative_keywords
         extra_software_keywords = extra_software_keywords or prefs.extra_keywords
+        preferred_platforms = preferred_platforms or prefs.preferred_platforms
+        deprioritized_platforms = deprioritized_platforms or prefs.deprioritized_platforms
 
     now = now or datetime.now(UTC)
     preferred_locations = [loc.lower() for loc in (preferred_locations or [])]
@@ -204,9 +215,17 @@ def score_job(
         matched += matched_locs
 
     # Direct ATS link (not an aggregator / generic company page)
-    if job.platform_slug and job.platform_slug not in ("company", "generic"):
+    if is_direct_ats(job.platform_slug):
         score += _W["ats"]
         breakdown["ats"] = _W["ats"]
+
+    # Platform preference: quick applications (Ashby/Greenhouse/Lever) rank
+    # above ones that demand an account and a multi-page form (Workday/Oracle).
+    pref = platform_factor(job.platform_slug, preferred_platforms, deprioritized_platforms)
+    if pref:
+        bonus = pref * _W["platform_pref"]
+        score += bonus
+        breakdown["platform_pref"] = round(bonus, 4)
 
     # Freshness
     fresh = _freshness_score(job.posting_date, now) * _W["freshness"]

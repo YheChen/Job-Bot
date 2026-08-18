@@ -257,6 +257,30 @@ class JobsCog(commands.Cog):
         await settings_service.disable_platform(interaction.guild_id, slug)
         await interaction.response.send_message(f"Disabled `{slug}`.", ephemeral=True)
 
+    @jobs.command(
+        name="set-platform-priority", description="Rank ATS platforms higher/lower in results"
+    )
+    @app_commands.describe(
+        preferred="Comma-separated slugs ranked highest (blank = built-in defaults)",
+        deprioritized="Comma-separated slugs ranked lowest (blank = built-in defaults)",
+    )
+    async def set_platform_priority(
+        self,
+        interaction: discord.Interaction,
+        preferred: str | None = None,
+        deprioritized: str | None = None,
+    ) -> None:
+        if not await self._ensure_manager(interaction):
+            return
+        pref, depri = await settings_service.set_platform_priority(
+            interaction.guild_id, preferred, deprioritized
+        )
+        await interaction.response.send_message(
+            f"Preferred: {', '.join(pref) or '(defaults)'}\n"
+            f"Deprioritized: {', '.join(depri) or '(defaults)'}",
+            ephemeral=True,
+        )
+
     @jobs.command(name="add-company-domain", description="Track a company career domain")
     async def add_company_domain(self, interaction: discord.Interaction, domain: str) -> None:
         if not await self._ensure_manager(interaction):
