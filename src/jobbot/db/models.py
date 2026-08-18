@@ -86,6 +86,8 @@ class GuildSettings(Base, TimestampMixin):
     company_domains: Mapped[list] = mapped_column(JSON, default=list)
     disabled_platforms: Mapped[list] = mapped_column(JSON, default=list)
     # Platform ranking preferences; empty lists mean "use the built-in tiers".
+    # When True, `locations` is a hard filter rather than a scoring bonus.
+    require_location: Mapped[bool] = mapped_column(Boolean, default=False)
     preferred_platforms: Mapped[list] = mapped_column(JSON, default=list)
     deprioritized_platforms: Mapped[list] = mapped_column(JSON, default=list)
 

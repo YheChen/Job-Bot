@@ -1,7 +1,7 @@
 {
   "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
   "schema_version": "1.0",
-  "last_updated": "2026-08-17",
+  "last_updated": "2026-08-18",
   "project": {
     "name": "jobbot",
     "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
@@ -30,7 +30,7 @@
   ],
   "current_state": {
     "branch": "master (clean)",
-    "tests": "176 passing (pytest); unit + integration, no network required",
+    "tests": "215 passing (pytest); unit + integration, no network required",
     "db_schema": "15 tables. 0001_initial uses metadata.create_all (NOT a frozen snapshot); 0002 adds the platform-priority columns and is idempotent-by-inspection to survive both fresh and existing databases.",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
     "deployment_status": "LIVE on the ThinkPad since 2026-08-08 (docker-compose.prod.yml). Scans run every 6h and the pipeline works; the post channel was unset until 2026-08-17, so ~684 jobs queued up unposted. Delivery is capped at 25/scan.",
@@ -44,7 +44,8 @@
       "#7 Add scripts/dry_run.py to preview what would be posted",
       "#8 Apply guild settings to relevance scoring",
       "#9 Rank ATS platforms by application friction",
-      "#10 Publish listings to a GitHub README"
+      "#10 Publish listings to a GitHub README",
+      "#11 Filter jobs to target metros"
     ]
   },
   "discovery_paths": {
@@ -98,6 +99,7 @@
     ]
   },
   "open_items": [
+    "User's guild still needs `/jobs set-locations locations:\"Bay Area, Toronto, Seattle, NYC, Redmond\" required:True` after deploying #11 \u2014 the filter is opt-in per guild and their existing row has require_location=false.",
     "Deploy to the ThinkPad home server via DEPLOY.md Path A (Docker Compose) \u2014 this is the first REAL run; watch how extraction/scoring behave on live ATS pages. Consider GITHUB_LISTINGS_LOOKBACK_DAYS=3 for the first scan so the feed backlog does not trickle out 25/scan.",
     "Optional: enable GitHub branch protection on master requiring the 'test' status check (must be toggled in GitHub Settings > Branches; cannot be set via CLI here).",
     "KNOWN BUGS still open (all verified, none fixed yet): (1) normalize_title truncates at the first ' - ', so distinct roles at one company collapse to one dedup key and only one is ever posted (e.g. Notion 'SWE Intern - Summer 2027' vs '- Winter 2027'); (2) /jobs pause writes the flag but nothing reads it at scan time; (3) no on_guild_join handler, so a server joined after startup gets no scheduled scans until restart; (4) importing jobbot.platforms.* before jobbot.parsing.* raises ImportError (circular import); (5) APScheduler jobs have no misfire_grace_time, so a run whose fire time passes while the host is suspended is skipped entirely.",
@@ -106,6 +108,7 @@
     "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
+    "2026-08-18 PR #11: location filtering. scoring/locations.py adds alias groups (bay area/toronto/seattle/nyc/redmond, remote opt-in) and match_location(); ScoringPrefs.require_location turns `locations` from a bonus into a hard filter applied at INGEST so filtered jobs never enter the DB. Bare state codes are intentionally excluded as aliases so 'Ontario, CA' and 'Spokane, WA' are rejected. DEFAULT_LOCATIONS in queries/terms.py narrowed to the five target metros so query generation matches. Migration 0003 (require_location), idempotent like 0002. Live effect: 465 -> 252 relevant candidates over 30 days (bay 169, seattle 32, toronto 29, nyc 22).",
     "2026-08-17 PR #10: GitHub README publishing (jobbot/publishers/). Renders open jobs as a Markdown table and commits via the GitHub Contents API after each scan; off unless ENABLE_GITHUB_PUBLISH + token + repo are set. Tests caught three holes in the first implementation: repo slug '../evil' passed validation (path traversal into the API path), '/abs/path' passed path validation, and backslash-escaping '<' was weaker than entity-encoding \u2014 all fixed in source.",
     "2026-08-17 PR #9: platform priority. Scorer now grades the hosting ATS (new platform_pref weight 0.10) instead of giving every ATS a flat bonus: ashby/greenhouse/lever/workable/smartrecruiters full, other known ATS half, workday/oracle/successfactors/icims/adp none. Configurable per guild via /jobs set-platform-priority (new guild_settings columns + migration 0002). NOTE 0002 is idempotent-by-inspection because 0001_initial uses metadata.create_all and therefore already creates new columns on a FRESH db while an existing db lacks them \u2014 every future additive migration needs the same treatment until 0001 is frozen to an explicit schema.",
     "2026-07-14 Initial handover.json created after PRs #1-#3 (SQLite/no-Docker, CI, pre-commit).",

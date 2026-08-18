@@ -122,6 +122,7 @@ class ScanService:
             extra_keywords=list(settings_row.extra_keywords or []),
             preferred_platforms=list(settings_row.preferred_platforms or []),
             deprioritized_platforms=list(settings_row.deprioritized_platforms or []),
+            require_location=bool(settings_row.require_location),
         )
 
     def _query_config(self, settings_row) -> QueryGenConfig:
@@ -341,8 +342,15 @@ class ScanService:
                 await self._touch_existing(
                     session, match.existing_key, extracted, raw_url, query_id, provider
                 )
-            elif scored.is_internship and scored.is_software and not scored.negatives:
-                # Only persist genuine internships (passes gate); skip noise.
+            elif (
+                scored.is_internship
+                and scored.is_software
+                and not scored.negatives
+                and scored.location_ok
+            ):
+                # Only persist genuine internships that clear every gate,
+                # including the optional location filter — otherwise a
+                # filtered-out job would still bloat the database.
                 await self._insert_job(
                     session,
                     extracted,

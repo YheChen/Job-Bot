@@ -90,17 +90,15 @@ DEFAULT_ACADEMIC_TERMS: list[str] = [
     "2027 co-op",
 ]
 
+# Target metros. Kept in step with scoring/locations.py alias groups so the
+# same places are searched for and filtered on.
 DEFAULT_LOCATIONS: list[str] = [
-    "Toronto",
-    "Canada",
-    "United States",
-    "New York",
+    "Bay Area",
     "San Francisco",
+    "Toronto",
     "Seattle",
-    "Vancouver",
-    "Waterloo",
-    "Remote",
-    "North America",
+    "New York",
+    "Redmond",
 ]
 
 # ATS platforms. slug -> (display name, search domain)
