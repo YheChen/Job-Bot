@@ -145,3 +145,30 @@ def test_missing_location_falls_back_to_title():
 def test_missing_location_with_no_hint_is_filtered_out():
     prefs = ScoringPrefs(locations=TARGETS, require_location=True)
     assert not score_job(_job(None), prefs=prefs, now=NOW).location_ok
+
+
+# --- purge helper semantics ----------------------------------------------- #
+def test_purge_predicate_matches_the_live_filter():
+    """The purge script must judge a job exactly as _ingest would.
+
+    It reuses match_location with the same (location or title) fallback, so
+    this pins that contract rather than a second copy of the rules.
+    """
+    cases = {
+        "SF": True,
+        "San Jose, CA": True,
+        "Toronto, ON, Canada": True,
+        "Seattle, WA": True,
+        "Chicago, IL": False,
+        "London, UK": False,
+        None: False,
+    }
+    for location, expected in cases.items():
+        job = _job(location)
+        via_scorer = score_job(
+            job, prefs=ScoringPrefs(locations=TARGETS, require_location=True), now=NOW
+        ).location_ok
+        via_purge = bool(match_location(job.location or job.title, TARGETS))
+        assert via_scorer is expected, location
+        assert via_purge is expected, location
+        assert via_scorer == via_purge, f"purge and ingest disagree on {location!r}"

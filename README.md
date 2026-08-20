@@ -266,6 +266,15 @@ Manhattan and Brooklyn.
 Bare state/province codes are deliberately **not** aliases — `Ontario, CA` is in
 California and `Spokane, WA` is not Seattle, and both are correctly rejected.
 
+Filtering applies at **ingest**, so it only affects jobs found from that point
+on. To retire jobs already stored from before, run the purge tool (dry run by
+default, and it reuses the same matcher so it agrees with the live filter):
+
+```bash
+docker compose -f docker-compose.prod.yml exec bot python scripts/purge_locations.py
+docker compose -f docker-compose.prod.yml exec bot python scripts/purge_locations.py --apply
+```
+
 `Remote` is opt-in: add it to the list to include remote roles. A location the
 alias table doesn't know (e.g. `Austin`) is matched literally, so nothing you
 type is silently ignored. If a posting has no location field, the title is used
