@@ -1,7 +1,7 @@
 {
   "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
   "schema_version": "1.0",
-  "last_updated": "2026-08-18",
+  "last_updated": "2026-08-20",
   "project": {
     "name": "jobbot",
     "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
@@ -30,7 +30,7 @@
   ],
   "current_state": {
     "branch": "master (clean)",
-    "tests": "215 passing (pytest); unit + integration, no network required",
+    "tests": "232 passing (pytest); now includes tests/test_cog_commands.py which invokes the /jobs handlers via .callback with a stubbed interaction",
     "db_schema": "15 tables. 0001_initial uses metadata.create_all (NOT a frozen snapshot); 0002 adds the platform-priority columns and is idempotent-by-inspection to survive both fresh and existing databases.",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
     "deployment_status": "LIVE on the ThinkPad since 2026-08-08 (docker-compose.prod.yml). Scans run every 6h and the pipeline works; the post channel was unset until 2026-08-17, so ~684 jobs queued up unposted. Delivery is capped at 25/scan.",
@@ -45,7 +45,8 @@
       "#8 Apply guild settings to relevance scoring",
       "#9 Rank ATS platforms by application friction",
       "#10 Publish listings to a GitHub README",
-      "#11 Filter jobs to target metros"
+      "#11 Filter jobs to target metros",
+      "#12 Fix /jobs set-locations crash + report command errors"
     ]
   },
   "discovery_paths": {
@@ -99,6 +100,7 @@
     ]
   },
   "open_items": [
+    "After deploying #12, re-run `/jobs set-locations locations:\"Bay Area, Toronto, Seattle, NYC, Redmond\" required:True` \u2014 the earlier attempt saved the locations but left require_location=false, so the filter is NOT yet active.",
     "User's guild still needs `/jobs set-locations locations:\"Bay Area, Toronto, Seattle, NYC, Redmond\" required:True` after deploying #11 \u2014 the filter is opt-in per guild and their existing row has require_location=false.",
     "Deploy to the ThinkPad home server via DEPLOY.md Path A (Docker Compose) \u2014 this is the first REAL run; watch how extraction/scoring behave on live ATS pages. Consider GITHUB_LISTINGS_LOOKBACK_DAYS=3 for the first scan so the feed backlog does not trickle out 25/scan.",
     "Optional: enable GitHub branch protection on master requiring the 'test' status check (must be toggled in GitHub Settings > Branches; cannot be set via CLI here).",
@@ -108,6 +110,7 @@
     "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
+    "2026-08-20 PR #12: FIELD BUG. /jobs set-locations crashed with 'The application didn't respond'. PR #11 changed settings_service.set_locations to return (locations, require_location) but the matching edit to bot/cogs/jobs.py silently no-op'd (a str.replace whose target text no longer matched after formatting), so the cog still called the 1-arg form and did ', '.join(tuple). No test caught it because every existing test called the SERVICE directly and none exercised the cog. Fixed the cog, added cog_app_command_error so handler exceptions are reported in Discord instead of a silent timeout, and added tests/test_cog_commands.py (verified to fail against the broken cog). LESSON: verify string-replacement patches actually applied \u2014 assert the target exists before replacing.",
     "2026-08-18 PR #11: location filtering. scoring/locations.py adds alias groups (bay area/toronto/seattle/nyc/redmond, remote opt-in) and match_location(); ScoringPrefs.require_location turns `locations` from a bonus into a hard filter applied at INGEST so filtered jobs never enter the DB. Bare state codes are intentionally excluded as aliases so 'Ontario, CA' and 'Spokane, WA' are rejected. DEFAULT_LOCATIONS in queries/terms.py narrowed to the five target metros so query generation matches. Migration 0003 (require_location), idempotent like 0002. Live effect: 465 -> 252 relevant candidates over 30 days (bay 169, seattle 32, toronto 29, nyc 22).",
     "2026-08-17 PR #10: GitHub README publishing (jobbot/publishers/). Renders open jobs as a Markdown table and commits via the GitHub Contents API after each scan; off unless ENABLE_GITHUB_PUBLISH + token + repo are set. Tests caught three holes in the first implementation: repo slug '../evil' passed validation (path traversal into the API path), '/abs/path' passed path validation, and backslash-escaping '<' was weaker than entity-encoding \u2014 all fixed in source.",
     "2026-08-17 PR #9: platform priority. Scorer now grades the hosting ATS (new platform_pref weight 0.10) instead of giving every ATS a flat bonus: ashby/greenhouse/lever/workable/smartrecruiters full, other known ATS half, workday/oracle/successfactors/icims/adp none. Configurable per guild via /jobs set-platform-priority (new guild_settings columns + migration 0002). NOTE 0002 is idempotent-by-inspection because 0001_initial uses metadata.create_all and therefore already creates new columns on a FRESH db while an existing db lacks them \u2014 every future additive migration needs the same treatment until 0001 is frozen to an explicit schema.",
