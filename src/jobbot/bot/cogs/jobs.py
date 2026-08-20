@@ -22,6 +22,29 @@ class JobsCog(commands.Cog):
 
     jobs = app_commands.Group(name="jobs", description="Internship discovery commands")
 
+    async def cog_app_command_error(
+        self, interaction: discord.Interaction, error: app_commands.AppCommandError
+    ) -> None:
+        """Report failures to the user.
+
+        Without this, an exception in a handler leaves the interaction
+        unacknowledged and Discord shows only "The application didn't
+        respond", with the real cause buried in container logs.
+        """
+        log.error(
+            "command_failed",
+            command=getattr(interaction.command, "qualified_name", "?"),
+            error=repr(error),
+        )
+        message = "That command failed. The error has been logged."
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(message, ephemeral=True)
+            else:
+                await interaction.response.send_message(message, ephemeral=True)
+        except discord.DiscordException:
+            pass  # interaction already expired; nothing more we can do
+
     # --- shared admin guard ------------------------------------------- #
     async def _ensure_manager(self, interaction: discord.Interaction) -> bool:
         role_ids = set(getattr(self.bot, "manager_role_ids", set()))
@@ -203,11 +226,25 @@ class JobsCog(commands.Cog):
         await interaction.response.send_message(f"Scan interval set to {hours}h.", ephemeral=True)
 
     @jobs.command(name="set-locations", description="Comma-separated preferred locations")
-    async def set_locations(self, interaction: discord.Interaction, locations: str) -> None:
+    @app_commands.describe(
+        locations='e.g. "Bay Area, Toronto, Seattle, NYC, Redmond"',
+        required="True = only these locations; False = rank them higher",
+    )
+    async def set_locations(
+        self,
+        interaction: discord.Interaction,
+        locations: str,
+        required: bool | None = None,
+    ) -> None:
         if not await self._ensure_manager(interaction):
             return
-        vals = await settings_service.set_locations(interaction.guild_id, locations)
-        await interaction.response.send_message(f"Locations set: {', '.join(vals)}", ephemeral=True)
+        vals, is_required = await settings_service.set_locations(
+            interaction.guild_id, locations, required
+        )
+        mode = "ONLY these locations" if is_required else "ranked higher (not a filter)"
+        await interaction.response.send_message(
+            f"Locations set: {', '.join(vals)}\nMode: {mode}", ephemeral=True
+        )
 
     @jobs.command(name="set-terms", description="Comma-separated academic terms")
     async def set_terms(self, interaction: discord.Interaction, terms: str) -> None:
