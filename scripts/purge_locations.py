@@ -34,7 +34,7 @@ from jobbot.config import get_settings
 from jobbot.db import repositories as repo
 from jobbot.db.models import Job, JobStatus
 from jobbot.db.session import dispose_engine, get_sessionmaker, init_engine
-from jobbot.scoring.locations import match_location
+from jobbot.scoring.locations import canonical_groups, match_location
 
 BAR = "─" * 74
 
@@ -50,7 +50,12 @@ async def _configured_locations() -> tuple[list[str], bool]:
         rows = await repo.all_active_guild_settings(session)
     for row in rows:
         if row.locations:
-            return list(row.locations), bool(row.require_location)
+            stored = row.locations
+            # NEVER list() a str: that yields one entry per character, which
+            # silently resolves to no locations and purges everything.
+            if isinstance(stored, str):
+                stored = [part for part in stored.strip("[]").split(",")]
+            return [str(x) for x in stored], bool(row.require_location)
     return [], False
 
 
@@ -64,6 +69,16 @@ async def main() -> int:
         help="DELETE rows instead of marking them closed (irreversible)",
     )
     parser.add_argument("--limit-preview", type=int, default=15)
+    parser.add_argument(
+        "--restore",
+        action="store_true",
+        help="Undo: reopen closed jobs that DO match the locations",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Purge even when it would remove nearly everything",
+    )
     args = parser.parse_args()
 
     settings = get_settings()
@@ -79,7 +94,10 @@ async def main() -> int:
         print(BAR)
         print("jobbot location purge" + ("" if args.apply else "  (DRY RUN — nothing modified)"))
         print(BAR)
-        print(f"locations ({source}): {', '.join(locations) or '(none)'}")
+        # repr, not join: a mis-typed or mis-stored value must be visible
+        # rather than reading as a plausible sentence.
+        print(f"locations ({source}): {locations!r}")
+        print(f"resolved to groups: {canonical_groups(locations)!r}")
         print(f"require_location currently: {required}")
 
         if not locations:
@@ -93,6 +111,27 @@ async def main() -> int:
             )
 
         maker = get_sessionmaker()
+
+        if args.restore:
+            async with maker() as session:
+                closed = list(
+                    (
+                        await session.execute(select(Job).where(Job.status == JobStatus.closed))
+                    ).scalars()
+                )
+                reopen = [j for j in closed if match_location(j.location or j.title, locations)]
+                print(f"\nclosed jobs: {len(closed)}    reopening: {len(reopen)}")
+                for job in reopen[:5]:
+                    print(f"   {(job.location or '(no location)')[:44]}")
+                if not args.apply:
+                    print("\nDry run. Re-run with --restore --apply to reopen them.")
+                    return 0
+                for job in reopen:
+                    job.status = JobStatus.active
+                await session.commit()
+            print(f"\n{len(reopen)} jobs reopened. Run /jobs scan to republish.")
+            return 0
+
         async with maker() as session:
             jobs = list(
                 (await session.execute(select(Job).where(Job.status == JobStatus.active))).scalars()
@@ -107,6 +146,23 @@ async def main() -> int:
         if not purge:
             print("Nothing to do.")
             return 0
+
+        if keep:
+            print("\nkeeping, for example:")
+            for job in keep[:5]:
+                print(f"   {(job.location or '(no location)')[:44]:46s} {(job.company or '')[:24]}")
+
+        # A filter that removes nearly everything is almost always a
+        # misconfiguration, not an intent. Make the operator confirm.
+        share = len(purge) / len(jobs)
+        if share > 0.85 and not args.force:
+            print(
+                f"\n{BAR}\nREFUSING: this would purge {share:.0%} of active jobs.\n"
+                "That usually means the configured locations are wrong — check the\n"
+                "'resolved to groups' line above. Re-run with --force to override,\n"
+                'or pass --locations "Bay Area,Toronto,..." explicitly.'
+            )
+            return 2
 
         counts = collections.Counter((j.location or "(no location)") for j in purge)
         print("\nlocations being removed:")
