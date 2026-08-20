@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 import pytest
 
 from jobbot.parsing.models import ExtractedJob
-from jobbot.scoring.locations import LOCATION_ALIASES, match_location
+from jobbot.scoring.locations import LOCATION_ALIASES, canonical_groups, match_location
 from jobbot.scoring.relevance import ScoringPrefs, score_job
 
 NOW = datetime(2026, 8, 18, tzinfo=UTC)
@@ -172,3 +172,32 @@ def test_purge_predicate_matches_the_live_filter():
         assert via_scorer is expected, location
         assert via_purge is expected, location
         assert via_scorer == via_purge, f"purge and ingest disagree on {location!r}"
+
+
+# --- canonical_groups robustness ------------------------------------------ #
+def test_a_bare_string_is_split_not_iterated():
+    """Regression: a stringified list was iterated character-by-character,
+    resolving to zero locations and silently rejecting every job."""
+    assert canonical_groups("Bay Area, Toronto") == ["bay area", "toronto"]
+    assert canonical_groups('["Bay Area", "Toronto"]') == ["bay area", "toronto"]
+
+
+def test_stringified_list_still_matches_correctly():
+    stringified = '["Bay Area", "Toronto", "Seattle", "NYC", "Redmond"]'
+    assert match_location("San Jose, CA", stringified) == "bay area"
+    assert match_location("Redmond, WA", stringified) == "redmond"
+    assert match_location("Chicago, IL", stringified) is None
+
+
+def test_single_character_entries_are_discarded():
+    """Characters only arise from an iterated string; they must never become
+    filter terms, or a location like 'Austin' matches on a stray 'a'."""
+    assert canonical_groups(["a", "[", '"', "S"]) == []
+
+
+def test_non_string_entries_are_ignored():
+    assert canonical_groups(["Toronto", None, 42, {"x": 1}]) == ["toronto"]
+
+
+def test_quotes_and_brackets_are_stripped_from_entries():
+    assert canonical_groups(['"Seattle"', "[Toronto]"]) == ["seattle", "toronto"]

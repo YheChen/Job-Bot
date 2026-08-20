@@ -72,15 +72,29 @@ def _alias_pattern(group: str) -> re.Pattern[str] | None:
     return re.compile(rf"(?<![a-z0-9])(?:{joined})(?![a-z0-9])", re.IGNORECASE)
 
 
-def canonical_groups(locations: list[str] | tuple[str, ...] | None) -> list[str]:
+def canonical_groups(locations: str | list[str] | tuple[str, ...] | None) -> list[str]:
     """Map configured names onto known alias groups, keeping unknown ones.
 
     An unrecognized entry (e.g. "Austin") still works — it is matched
     literally — so the filter never silently ignores what someone typed.
+
+    A bare string is split on commas rather than iterated. Iterating one
+    character-at-a-time silently turns every location into a meaningless
+    single letter, which matches nothing — a filter that quietly rejects
+    everything is far worse than one that errors.
     """
+    if isinstance(locations, str):
+        locations = [part for part in locations.split(",")]
+
     groups: list[str] = []
     for raw in locations or ():
-        name = (raw or "").strip().lower()
+        if not isinstance(raw, str):
+            continue
+        name = raw.strip().strip("[]\"'").strip().lower()
+        # A single character is never a real location; it only arises from a
+        # value that was iterated instead of parsed.
+        if len(name) < 2:
+            continue
         if name and name not in groups:
             groups.append(name)
     return groups
