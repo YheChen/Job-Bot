@@ -1,10 +1,17 @@
 # Software Engineering Internships
 
-<!-- jobbot:content-hash=44366b27f812024c -->
-_200 open roles · last updated 2026-08-24 12:47 UTC_
+<!-- jobbot:content-hash=132789d244cfb774 -->
+_200 open roles · last updated 2026-08-24 18:47 UTC_
 
 | Company | Role | Location | Term | Application | Age |
 | --- | --- | --- | --- | --- | --- |
+| Audax Group | Data Engineer Co-op | NYC | Winter 2027 | [Apply](<https://job-boards.greenhouse.io/audaxgroup/jobs/4722770005>) | today |
+| BNY | Software Developer Intern - Engineering | NYC | Summer 2027 | [Apply](<https://eofe.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/81253>) | today |
+| BNY | Data Science Intern - Engineering | NYC | Summer 2027 | [Apply](<https://eofe.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/81240>) | today |
+| Google | Software Developer Intern | Montreal, QC, Canada; Toronto, ON, Canada; Waterloo, ON, Ca… | Summer 2027 | [Apply](<https://www.google.com/about/careers/applications/jobs/results/112518690523488966>) | today |
+| Google | Software Engineer Intern | Palo Alto, CA; Cambridge, MA; Madison, WI (+27 more) | Summer 2026 | [Apply](<https://www.google.com/about/careers/applications/jobs/results/91436104816698054>) | today |
+| Royal Bank of Canada | Technology/Developer Co-op - Wealth Management | Toronto, ON, Canada; Vancouver, BC, Canada | — | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/TORONTO-Ontario-Canada/XMLNAME-2027-Wealth-Management--Winter-Technology-Developer--4-16-months-_R-0000185490>) | today |
+| Mastercard | Software Engineer Intern | O'Fallon, MO; Arlington County, Arlington, VA; NYC (+1 more) | Summer 2027 | [Apply](<https://mastercard.wd1.myworkdayjobs.com/Campus/job/OFallon-Missouri/Software-Engineer-Intern--Summer-2027---United-States_R-287618-1>) | today |
 | — | Software Engineer Intern | — | — | [Apply](<https://job-boards.greenhouse.io/opswat/jobs/4623189005>) | 1d |
 | — | Software Engineering Intern (2027 Start) - Winter | — | — | [Apply](<https://job-boards.greenhouse.io/databricks/jobs/8732364002>) | 1d |
 | HNTB Corporation | WED - Intern Civil Engineer (Summer 2027) (For Current &amp; Recent HNTB Interns Only) (Campus Recruiting Hub Requisiti… | Oakland, CA, United States of America | Summer 2027 | [Apply](<https://hntb.wd5.myworkdayjobs.com/hntb_careers/job/Oakland-CA/WED---Intern-Civil-Engineer--Summer-2027---For-Current---Recent-HNTB-Interns-Only---Campus-Recruiting-Hub-Requisition-_R-31285-1>) | 3d |
@@ -39,7 +46,7 @@ _200 open roles · last updated 2026-08-24 12:47 UTC_
 | Mechanize, Inc. | Software Engineering Intern | San Francisco, California, United States | — | [Apply](<https://jobs.ashbyhq.com/mechanize/d148d54f-6db7-4c28-9699-0304596f554e>) | 278d |
 | Freeform | Materials Engineer Intern | LA | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/freeformfuturecorp/jobs/7907965003>) | 4d |
 | Fifth Third Bank | Software Engineer Co-op - Enterprise Finance Applications - Summer 2027 | Cincinnati, OH | Summer 2027 | [Apply](<https://fifththird.wd5.myworkdayjobs.com/en-US/53careers/job/Cincinnati-OH/Software-Engineer-Co-Op---Enterprise-Finance-Applications---Summer-2027_R71588>) | 4d |
-| AbbVie | Business Technology Solutions Intern - Data & Software Engineering - Undergraduate | North Chicago, IL | Summer 2027 | [Apply](<https://jobs.smartrecruiters.com/AbbVie/3743990014697918>) | 3d |
+| AbbVie | Business Technology Solutions Intern - Data & Software Engineering - Undergraduate | North Chicago, IL | Summer 2027 | [Apply](<https://jobs.smartrecruiters.com/AbbVie/3743990014697918>) | 4d |
 | Western Magnetics | Software Engineering Intern - Western Magnetics | — | — | [Apply](<https://apply.workable.com/western-magnetics/j/E366930F3F>) | 4d |
 | Aumovio | HPC Software Engineer Intern \[IDA: 00053\] | — | — | [Apply](<https://jobs.smartrecruiters.com/Aumovio/744000144245645-hpc-software-engineer-intern-ida-00053->) | 4d |
 | Sezzleinternships | SRE / Platform Infrastructure Engineer Intern | — | — | [Apply](<https://job-boards.greenhouse.io/sezzleinternships/jobs/7895906003>) | 4d |
@@ -79,11 +86,11 @@ _200 open roles · last updated 2026-08-24 12:47 UTC_
 | Foresters Financial | Software Engineer Co-op - AI | Toronto, ON, Canada | Fall 2026 | [Apply](<https://foresters.wd3.myworkdayjobs.com/ForestersFinancialCareers/job/Toronto-Ontario/Software-Engineer-Co-op-Student--AI---4-month-contract-_R-2305>) | 6d |
 | DP Architects Pte Ltd | AI/Data Engineer Intern | Singapore Office, Singapore | — | [Apply](<https://dpgroup.wd102.myworkdayjobs.com/en-US/Careers_DP/job/AI-Data-Engineer-Intern_JR00415>) | 19d |
 | Xsolla | AI-First Engineering Intern(shanghai) | Shanghai | — | [Apply](<https://jobs.lever.co/xsolla/1c60d455-ff66-4eaa-97b8-743d0d6e79d1>) | 34d |
-| Bosch Group | \[EAF\] AI Engineer Intern (6-month fulltime Internship) | — | — | [Apply](<https://jobs.smartrecruiters.com/BoschGroup/744000143977589--eaf-ai-engineer-intern-6-month-fulltime-internship->) | 5d |
+| Bosch Group | \[EAF\] AI Engineer Intern (6-month fulltime Internship) | — | — | [Apply](<https://jobs.smartrecruiters.com/BoschGroup/744000143977589--eaf-ai-engineer-intern-6-month-fulltime-internship->) | 6d |
 | Perplexity | Internship - Search Machine Learning Engineer | Belgrade, Serbia | — | [Apply](<https://jobs.ashbyhq.com/perplexity/9246cf02-26fd-4ae8-90c5-639c6e85e9e2>) | 223d |
 | 100000 Motorola Solutions, Inc. | Android Platform Software Engineering Intern - Summer 2027 | Plantation, FL, United States of America | Summer 2027 | [Apply](<https://motorolasolutions.wd5.myworkdayjobs.com/en-US/Careers/job/Android-Platform-Software-Engineering-Intern---Summer-2027_R67362-1>) | 10d |
-| — | Software Engineering Intern (Winter) | — | — | [Apply](<https://job-boards.greenhouse.io/datadog/jobs/8052095>) | 5d |
-| Sherwin-Williams | IT Database Engineer Co-op | Cleveland, OH | Fall 2026 | [Apply](<https://ejhp.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2/job/2621017>) | 5d |
+| — | Software Engineering Intern (Winter) | — | — | [Apply](<https://job-boards.greenhouse.io/datadog/jobs/8052095>) | 6d |
+| Sherwin-Williams | IT Database Engineer Co-op | Cleveland, OH | Fall 2026 | [Apply](<https://ejhp.fa.us6.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2/job/2621017>) | 6d |
 | Royal Bank of Canada | AI Applications Intern - Group Risk Management | Toronto, ON, Canada | Winter 2027 | [Apply](<https://rbc.wd3.myworkdayjobs.com/rbcglobal1/job/TORONTO-Ontario-Canada/XMLNAME-2027-Winter---GRM--MCCR-Policy-AI-Applications-Intern--4-Months-_R-0000184696>) | 6d |
 | Draper | Full Stack Web Development Co-op - Spring 2027 | Cambridge, MA | Spring 2027 | [Apply](<https://draper.wd5.myworkdayjobs.com/Draper_Careers/job/Cambridge-MA/Full-Stack-Web-Development-Co-Op--Spring-2027-_JR002832-1>) | 6d |
 | John Deere | Product Engineering Student - Product Engineering | Fargo, ND; Illinois | — | [Apply](<https://johndeere.eightfold.ai/careers/job/137482769210>) | 6d |
@@ -99,7 +106,7 @@ _200 open roles · last updated 2026-08-24 12:47 UTC_
 | American Express | Campus Undergraduate Summer Internship Program - 2027 Software Engineer, Enterprise Technology Services- Charlotte, NC | — | — | [Apply](<https://egug.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/26011679>) | 6d |
 | Thomson Reuters | Applied Research Intern - NLP/ML/GenAI | Toronto, ON, Canada | Fall 2026 | [Apply](<https://thomsonreuters.wd5.myworkdayjobs.com/en-US/External_Career_Site/job/Canada-Toronto-Ontario/Applied-Research-Intern--NLP-ML-GenAI-_JREQ202812>) | 7d |
 | Intel | Software Development Intern | Folsom, CA | Fall 2026 | [Apply](<https://intel.wd1.myworkdayjobs.com/en-us/external/job/US-California-Folsom/Software-Development-Graduate-Intern_JR0285451-1>) | 7d |
-| Royal Bank of Canada | Data Analyst Co-op - AI Business Enablement | Toronto, ON, Canada | Winter 2027 | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/RBC-WATERPARK-PLACE-88-QUEENS-QUAY-WTORONTO/XMLNAME-2027-Winter-Student-Opportunities-RBC-Borealis---AI-Data-Analyst---8-Months_R-0000184505>) | 7d |
+| Royal Bank of Canada | Data Analyst Co-op - Wealth Management | Toronto, ON, Canada | Winter 2027 | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/RBC-WATERPARK-PLACE-88-QUEENS-QUAY-WTORONTO/XMLNAME-2027-Winter-Student-Opportunities-RBC-Borealis---AI-Data-Analyst---8-Months_R-0000184505>) | 7d |
 | Royal Bank of Canada | Software Developer Co-op - Technology & Operations | Toronto, ON, Canada | — | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/TORONTO-Ontario-Canada/XMLNAME-2027-Winter-Student-Opportunities-Capital-Markets--QTS---Software-Developer--4-months_R-0000184603-2>) | 7d |
 | Royal Bank of Canada | Technical Systems Analyst Co-op - Technology & Operations | Toronto, ON, Canada | Winter 2027 | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/TORONTO-Ontario-Canada/XMLNAME-2027-Winter-Student-Opportunities-Technology---Operations---Technical-Systems-Analyst--4-12-Months_R-0000184552-1>) | 7d |
 | Royal Bank of Canada | Technology & Operations Co-op - Software Developer | Toronto, ON, Canada | — | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/RBC-WATERPARK-PLACE-88-QUEENS-QUAY-WTORONTO/XMLNAME-2027-Winter-Student-Opportunities-Technology---Operations---Software-Developer--12-Months_R-0000184491-1>) | 7d |
@@ -119,20 +126,20 @@ _200 open roles · last updated 2026-08-24 12:47 UTC_
 | GE Aerospace | Aerospace Engineering Engines Co-op - Computer or Software Engineering | Lynn, MA; Evendale, OH | Fall 2027 | [Apply](<https://geaerospace.wd5.myworkdayjobs.com/ge_externalsite/job/Evendale/Engines-Engineering-Co-op---Computer-or-Software-Engineering---US---Fall-2027_R5029637-1>) | 6d |
 | NXP Semiconductors | AI and Software Engineer Intern - Automotive MPUs | Glasgow, UK | Summer 2026 | [Apply](<https://nxp.wd3.myworkdayjobs.com/en-US/careers/job/Glasgow/Intern-AI-and-Software-Engineer---Automotive-MPUs_R-10065882-1>) | 7d |
 | Forge Atomics Inc. | Nuclear Engineering Internship/Co-op | El Segundo, California, United States | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/forgeatomics/8831b6b7-38d8-41b3-97aa-9b7ec8d9af01>) | 11d |
-| Optiver | Software Engineer Intern | London, UK | Summer 2027 | [Apply](<https://www.optiver.com/join-us/jobs/8713435002>) | 6d |
-| DiDi Global | Motion Planning Engineer Intern - PhD | San Jose, CA | Fall 2026 | [Apply](<https://job-boards.greenhouse.io/didi/jobs/8131863>) | 6d |
-| Datadog | Software Engineer Intern - Observability and Security Platform | Boston, MA; NYC | Winter 2027 | [Apply](<https://careers.datadoghq.com/detail/8052095>) | 6d |
-| Daktronics | Software Design Student | Brookings, SD; Rapid City, SD | — | [Apply](<https://careers-daktronics.icims.com/jobs/7493/job?mobile=true&needsRedirect=false>) | 6d |
-| American Express | Software Engineer Intern - Enterprise Technology Services | Charlotte, NC | Summer 2027 | [Apply](<https://egug.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/26011987>) | 6d |
+| Optiver | Software Engineer Intern | London, UK | Summer 2027 | [Apply](<https://www.optiver.com/join-us/jobs/8713435002>) | 7d |
+| DiDi Global | Motion Planning Engineer Intern - PhD | San Jose, CA | Fall 2026 | [Apply](<https://job-boards.greenhouse.io/didi/jobs/8131863>) | 7d |
+| Datadog | Software Engineer Intern - Observability and Security Platform | Boston, MA; NYC | Winter 2027 | [Apply](<https://careers.datadoghq.com/detail/8052095>) | 7d |
+| Daktronics | Software Design Student | Brookings, SD; Rapid City, SD | — | [Apply](<https://careers-daktronics.icims.com/jobs/7493/job?mobile=true&needsRedirect=false>) | 7d |
+| American Express | Software Engineer Intern - Enterprise Technology Services | Charlotte, NC | Summer 2027 | [Apply](<https://egug.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/26011987>) | 7d |
 | Dayshape | Software Engineer Placement | Edinburgh, UK | — | [Apply](<https://apply.workable.com/dayshape/j/19F2A4F3F3/apply>) | 13d |
-| W.W. Grainger | Software Engineer Intern - Grainger Technology Group | Chicago, IL | Summer 2027 | [Apply](<https://jobs.grainger.com/job/CHICAGO-GTG-Intern-Software-Engineer-IL-60661-4555/1419930800?ats=successfactors>) | 6d |
-| W.W. Grainger | Business Systems Analyst Intern | Chicago, IL | Summer 2027 | [Apply](<https://jobs.grainger.com/job/CHICAGO-GTG-Intern-Business-Systems-Analyst-IL-60654-4203/1419931200?ats=successfactors>) | 6d |
+| W.W. Grainger | Software Engineer Intern - Grainger Technology Group | Chicago, IL | Summer 2027 | [Apply](<https://jobs.grainger.com/job/CHICAGO-GTG-Intern-Software-Engineer-IL-60661-4555/1419930800?ats=successfactors>) | 7d |
+| W.W. Grainger | Business Systems Analyst Intern | Chicago, IL | Summer 2027 | [Apply](<https://jobs.grainger.com/job/CHICAGO-GTG-Intern-Business-Systems-Analyst-IL-60654-4203/1419931200?ats=successfactors>) | 7d |
 | American Express | Software Engineer Intern - Enterprise Technology Services | — | — | [Apply](<https://egug.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/26011082>) | 7d |
 | Photon | Software Engineering Intern - AI | Remote in USA | Fall 2026 | [Apply](<https://fa-ertb-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_2/job/26738>) | 8d |
 | Replit | Software Engineering Intern (Summer 2027) | Foster City, California, USA | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/replit/7e0dafe8-3eec-442e-aa76-a4d84d779fb1>) | 9d |
 | Replit | Software Engineer Intern - Summer 2027 | Foster City, CA | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/replit/7e0dafe8-3eec-442e-aa76-a4d84d779fb1/application?embed=true>) | 8d |
 | Copart, Inc | Software Engineering Intern | US TX IT Software QA 726, United States of America | — | [Apply](<https://copart.wd12.myworkdayjobs.com/en-US/Copart/job/Software-Engineering-Intern_JR101510>) | 10d |
-| Freeformfuturecorp | Software Engineering Intern (Summer 2027) | — | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/freeformfuturecorp/jobs/7872198003>) | 8d |
+| Freeformfuturecorp | Software Engineering Intern (Summer 2027) | — | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/freeformfuturecorp/jobs/7872198003>) | 9d |
 | Dedalus Labs | Design Engineer Intern | SF | Fall 2026 | [Apply](<https://jobs.ashbyhq.com/dedalus-labs/bcd6db2e-400b-4ffa-aef3-0948a7b558c2/application?embed=true>) | 9d |
 | Cahoot | Web Developer / Software Engineering Intern | — | — | [Apply](<https://jobs.smartrecruiters.com/Cahoot/744000106160845-web-developer-software-engineering-intern>) | 9d |
 | Abridge | Software Engineer Intern | SF; NYC | Fall 2026 | [Apply](<https://jobs.ashbyhq.com/abridge/3f07a457-dc14-4238-bf4e-5c33b5c1f883/application?embed=true>) | 9d |
@@ -152,16 +159,16 @@ _200 open roles · last updated 2026-08-24 12:47 UTC_
 | The Nuclear Company | AI Applied Research Intern | Washington, DC | Spring 2027 | [Apply](<https://job-boards.greenhouse.io/thenuclearcompany/jobs/5391888008>) | 9d |
 | The Nuclear Company | Data Science & Machine Learning Fellow Intern | Washington, DC | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/thenuclearcompany/jobs/5391923008>) | 9d |
 | TransMarket Group | Software Engineer Intern | Chicago, IL | Fall 2026 | [Apply](<https://job-boards.greenhouse.io/transmarketgroup/jobs/5212335007?gh_jid=5212335007>) | 9d |
-| Rendezvousrobotics | Software Engineering Intern (Spring 2027) | — | Spring 2027 | [Apply](<https://job-boards.greenhouse.io/rendezvousrobotics/jobs/4329122009>) | 9d |
-| Cssmerge | Software Engineer Intern - Summer 2027 | — | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/cssmerge/jobs/8687896002>) | 9d |
-| Hermeus | Hermeus - Flight Software Engineering Intern - Fall 2026 | — | Fall 2026 | [Apply](<https://jobs.lever.co/hermeus/51378fa0-0327-45fd-9420-b6e7d8b56440/apply>) | 9d |
-| Ntst | Software Engineer Intern (Summer 2027 Internship) | — | Summer 2027 | [Apply](<https://ntst.wd1.myworkdayjobs.com/Careers/job/Software-Engineer-Intern--Summer-2027-Internship-_R015667>) | 9d |
-| Western Digital | Internship - Software Engineering | — | — | [Apply](<https://jobs.smartrecruiters.com/WesternDigital/744000142050119-internship-software-engineering>) | 9d |
+| Rendezvousrobotics | Software Engineering Intern (Spring 2027) | — | Spring 2027 | [Apply](<https://job-boards.greenhouse.io/rendezvousrobotics/jobs/4329122009>) | 10d |
+| Cssmerge | Software Engineer Intern - Summer 2027 | — | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/cssmerge/jobs/8687896002>) | 10d |
+| Hermeus | Hermeus - Flight Software Engineering Intern - Fall 2026 | — | Fall 2026 | [Apply](<https://jobs.lever.co/hermeus/51378fa0-0327-45fd-9420-b6e7d8b56440/apply>) | 10d |
+| Ntst | Software Engineer Intern (Summer 2027 Internship) | — | Summer 2027 | [Apply](<https://ntst.wd1.myworkdayjobs.com/Careers/job/Software-Engineer-Intern--Summer-2027-Internship-_R015667>) | 10d |
+| Western Digital | Internship - Software Engineering | — | — | [Apply](<https://jobs.smartrecruiters.com/WesternDigital/744000142050119-internship-software-engineering>) | 10d |
 | Melius | Software Engineering Intern \[Spring/Summer 2027\] | New York City, New York, United States | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/melius/b61f063a-4f94-4e50-a4ef-05aaab552280>) | 24d |
 | Front | Software Engineering Intern - Spring/Summer 2027 | Paris, Île-de-France, France | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/frontcareers/1026a32c-f8cc-4eee-992b-bacdf771d9fc>) | 12d |
-| Cynet Corp | Software Engineering Intern - Artificial Intelligence (Fall 2026) - Cynet Corp | — | Fall 2026 | [Apply](<https://apply.workable.com/cynet-corp/j/811F51F26E>) | 9d |
+| Cynet Corp | Software Engineering Intern - Artificial Intelligence (Fall 2026) - Cynet Corp | — | Fall 2026 | [Apply](<https://apply.workable.com/cynet-corp/j/811F51F26E>) | 10d |
 | Baker Hughes | Benefit Tool Developer Intern - Month Fixed Term Contract | Aberdeen, UK | Fall 2026 | [Apply](<https://bakerhughes.wd5.myworkdayjobs.com/BakerHughes/job/GB-AC-ABERDEEN-BAKER-HUGHES-BUILDING/Intern---Benefit-Tool-Developer--12-Month-Fixed-Term-Contract-_R168066>) | 10d |
-| Dmg Media | AI Engineer Intern - Innovation Team | London, UK | Fall 2026 | [Apply](<https://www.dmgmedia.co.uk/careers/jobs/id/8130352>) | 9d |
+| Dmg Media | AI Engineer Intern - Innovation Team | London, UK | Fall 2026 | [Apply](<https://www.dmgmedia.co.uk/careers/jobs/id/8130352>) | 10d |
 | Roche | Manual Software Test Engineer intern - Myworkdayjobs.com | — | — | [Apply](<https://roche.wd3.myworkdayjobs.com/en-US/roche-ext/job/Software-Test-Engineer-Intern_202608-120310/apply/applyManually>) | 10d |
 | Ngc | 2027 Intern Software Engineer - Myworkdayjobs.com | — | — | [Apply](<https://ngc.wd1.myworkdayjobs.com/en-US/Northrop_Grumman_External_Site/job/XMLNAME-2027-Intern-Software-Engineer_R10243573>) | 10d |
 | 100 Duke Energy Carolinas, LLC | Returning Engineering Intern/Co-op Summer 2027 | Duke Energy Plaza, United States of America | Summer 2027 | [Apply](<https://dukeenergy.wd1.myworkdayjobs.com/en-US/nosearch/job/Returning-Engineering-Intern-Co-op-Summer-2027_R40775>) | 20d |
@@ -190,20 +197,13 @@ _200 open roles · last updated 2026-08-24 12:47 UTC_
 | Johnson & Johnson | AI & Digital Co-op | Toronto, ON, Canada | Fall 2026 | [Apply](<https://jj.wd5.myworkdayjobs.com/JJ/job/Toronto-Ontario-Canada/AI---Digital-Co-Op_R-092243>) | 11d |
 | Thales | Data Engineer Intern - Student | Ottawa, ON, Canada | — | [Apply](<https://thales.wd3.myworkdayjobs.com/en-US/Careers/job/Ottawa/Data-Engineer---student_R0337006-1>) | 11d |
 | Crowe | AI Functional Intern | Chicago, IL | Fall 2026 | [Apply](<https://crowe.wd12.myworkdayjobs.com/en-US/external_careers/job/Chicago-IL-USA/AI-Functional-Intern_R-71008>) | 11d |
-| Fuku | Robotics Engineer Intern - Embodied AI - Fuku | — | — | [Apply](<https://apply.workable.com/fuku/j/938A879A4D>) | 10d |
+| Fuku | Robotics Engineer Intern - Embodied AI - Fuku | — | — | [Apply](<https://apply.workable.com/fuku/j/938A879A4D>) | 11d |
 | Malt | Data Engineer Intern (September 2026) | Paris | — | [Apply](<https://jobs.lever.co/malt/473946fd-c520-4892-a851-c486af9ed851>) | 75d |
-| Aumovio | Robotics AI Engineer Intern \[IDA: 00031\] | — | — | [Apply](<https://jobs.smartrecruiters.com/Aumovio/744000126217915-robotics-ai-engineer-intern-ida-00031->) | 10d |
+| Aumovio | Robotics AI Engineer Intern \[IDA: 00031\] | — | — | [Apply](<https://jobs.smartrecruiters.com/Aumovio/744000126217915-robotics-ai-engineer-intern-ida-00031->) | 11d |
 | RTX | Methods Intern - Hot Section Engineering | East Hartford, CT | Summer 2027 | [Apply](<https://globalhr.wd5.myworkdayjobs.com/fr-CA/Private_Posting_No_TMP/job/US-CT-EAST-HARTFORD-ETC--400-Main-St--BLDG-ETC/Methods-Intern---Hot-Section-Engineering--Summer-2027---Onsite-_01864520>) | 11d |
 | Calpion/Plutus Health | AI Engineering Intern - Python & Agentic AI | Dallas, TX | Summer 2026 | [Apply](<https://calpionplutus.bamboohr.com/careers/310>) | 11d |
 | Specter Aerospace | Front-End Software Developer Co-op | Boston, MA; Peabody, MA | Spring 2027 | [Apply](<https://specteraerospace.bamboohr.com/careers/120>) | 11d |
 | Specter Aerospace | Full Stack Developer Co-op | Boston, MA; Peabody, MA | Summer 2027 | [Apply](<https://specteraerospace.bamboohr.com/careers/122>) | 11d |
 | RRS Group | Data Engineering & Analytics Intern | SF | — | [Apply](<https://jobs.smartrecruiters.com/RRSGroup/744000130586249>) | 11d |
-| RRS Group | Software Engineer Intern - Placement Year | SF | Summer 2027 | [Apply](<https://jobs.smartrecruiters.com/RRSGroup/744000142513209>) | 11d |
-| Mapjects | PHP Developer Intern | Washington, DC | — | [Apply](<https://jobs.smartrecruiters.com/Mapjectscom/78665247>) | 11d |
-| Mapjects | Java Developer Intern - Web Application Developer | College Park, MD | — | [Apply](<https://jobs.smartrecruiters.com/Mapjectscom/79183538>) | 11d |
-| Mapjects | PHP or Drupal Web Developer Intern | Washington, DC | — | [Apply](<https://jobs.smartrecruiters.com/Mapjectscom/79253426>) | 11d |
-| Inbulks | Junior Front End Developer Intern | Long Island City, Queens, NY | Fall 2026 | [Apply](<https://jobs.smartrecruiters.com/InbulksCorp/743999750129753>) | 11d |
-| Maxima | Software Engineer - Intern | San Mateo, California, United States | — | [Apply](<https://jobs.ashbyhq.com/Maxima/c0204f04-af26-4a57-9658-64ee6d4beb74>) | 290d |
-| Dick's Sporting Goods | Data Engineer Co-op | Remote in USA | Summer 2022 | [Apply](<https://dickssportinggoods.wd1.myworkdayjobs.com/en-US/DSG/job/06083-GameChanger/Data-Engineering-Co-Op_202630722>) | 12d |
 
 _Generated automatically by [jobbot](https://github.com/YheChen/Job-Bot)._
