@@ -112,9 +112,13 @@ PLATFORMS: dict[str, tuple[str, str]] = {
     "smartrecruiters": ("SmartRecruiters", "jobs.smartrecruiters.com"),
     "smartrecruiters_careers": ("SmartRecruiters", "careers.smartrecruiters.com"),
     "workable": ("Workable", "apply.workable.com"),
+    # Workable's own board; different URL shape from apply.workable.com, so it
+    # gets the generic adapter rather than the Workable one.
+    "workable_careers": ("Workable", "careers.workable.com"),
     "jobvite": ("Jobvite", "jobs.jobvite.com"),
     "bamboohr": ("BambooHR", "jobs.bamboohr.com"),
     "icims": ("iCIMS", "jobs.icims.com"),
+    "icims_careers": ("iCIMS", "careers.icims.com"),
     "careerspage": ("Careers-Page", "careers-page.com"),
     "recruitee": ("Recruitee", "recruitee.com"),
     "personio": ("Personio", "jobs.personio.com"),
@@ -122,4 +126,5 @@ PLATFORMS: dict[str, tuple[str, str]] = {
     "adp": ("ADP", "careers.adp.com"),
     "oracle": ("Oracle Cloud", "oraclecloud.com"),
     "successfactors": ("SuccessFactors", "successfactors.com"),
+    "jazzhr": ("JazzHR", "apply.jazz.co"),
 }

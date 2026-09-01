@@ -1,7 +1,7 @@
 {
   "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
   "schema_version": "1.0",
-  "last_updated": "2026-08-20",
+  "last_updated": "2026-08-21",
   "project": {
     "name": "jobbot",
     "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
@@ -30,7 +30,7 @@
   ],
   "current_state": {
     "branch": "master (clean)",
-    "tests": "238 passing (pytest)",
+    "tests": "246 passing (pytest)",
     "db_schema": "15 tables. 0001_initial uses metadata.create_all (NOT a frozen snapshot); 0002 adds the platform-priority columns and is idempotent-by-inspection to survive both fresh and existing databases.",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
     "deployment_status": "LIVE on the ThinkPad since 2026-08-08 (docker-compose.prod.yml). Scans run every 6h and the pipeline works; the post channel was unset until 2026-08-17, so ~684 jobs queued up unposted. Delivery is capped at 25/scan.",
@@ -48,7 +48,8 @@
       "#11 Filter jobs to target metros",
       "#12 Fix /jobs set-locations crash + report command errors",
       "#13 Add scripts/purge_locations.py",
-      "#14 Fix purge over-matching + add restore"
+      "#14 Fix purge over-matching + add restore",
+      "#15 Add careers.icims.com, careers.workable.com, apply.jazz.co"
     ]
   },
   "discovery_paths": {
@@ -112,6 +113,7 @@
     "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
+    "2026-08-21 PR #15: added 3 ATS domains (careers.icims.com -> icims_careers, careers.workable.com -> workable_careers, apply.jazz.co -> jazzhr). careers.workable.com is registered as a GENERIC adapter, not added to WorkableAdapter.domains, because its URL shape is /jobs/<id>-<slug> and WorkableAdapter._company_from_url would derive the company 'Jobs' from it. Slug-base normalization in platform_prefs keeps *_careers variants in the same tier as their parent. PLATFORMS drives the SSRF allowlist too, so the new hosts became fetchable automatically. MEASURED: the SimplifyJobs feed contains ZERO listings on all three (and zero on jobs.icims.com); only apply.workable.com appears (25 of 2655). So their value is search-path only and is UNVERIFIED \u2014 no Serper key available to test. Candidate query pool grew 570 -> 660 while max_queries_per_scan stayed 40, so per-platform rotation is slightly diluted (~16.5 scans for full coverage vs ~14).",
     "2026-08-20 PR #14: FIELD INCIDENT. purge_locations.py --apply closed 726 of 804 jobs including San Jose/SF/Palo Alto/Redmond, which should have been kept. Cause: _configured_locations did list(row.locations); list() on a STRING yields one entry per character, so every location resolved to a single char and matched nothing. match_location itself was correct. Fixes: (1) canonical_groups splits a bare string on commas instead of iterating it, strips quotes/brackets, and drops <2-char entries; (2) _configured_locations never list()s a str; (3) the script prints locations with repr AND the resolved groups, so a bad value is visible; (4) a safety valve REFUSES to purge >85% of active jobs without --force; (5) --restore reopens closed jobs that match. Recovery is possible because --apply marks jobs closed rather than deleting. PROCESS LESSON (second occurrence): an unasserted str.replace patch silently no-op'd again \u2014 always assert the target text exists before replacing.",
     "2026-08-20 PR #12: FIELD BUG. /jobs set-locations crashed with 'The application didn't respond'. PR #11 changed settings_service.set_locations to return (locations, require_location) but the matching edit to bot/cogs/jobs.py silently no-op'd (a str.replace whose target text no longer matched after formatting), so the cog still called the 1-arg form and did ', '.join(tuple). No test caught it because every existing test called the SERVICE directly and none exercised the cog. Fixed the cog, added cog_app_command_error so handler exceptions are reported in Discord instead of a silent timeout, and added tests/test_cog_commands.py (verified to fail against the broken cog). LESSON: verify string-replacement patches actually applied \u2014 assert the target exists before replacing.",
     "2026-08-18 PR #11: location filtering. scoring/locations.py adds alias groups (bay area/toronto/seattle/nyc/redmond, remote opt-in) and match_location(); ScoringPrefs.require_location turns `locations` from a bonus into a hard filter applied at INGEST so filtered jobs never enter the DB. Bare state codes are intentionally excluded as aliases so 'Ontario, CA' and 'Spokane, WA' are rejected. DEFAULT_LOCATIONS in queries/terms.py narrowed to the five target metros so query generation matches. Migration 0003 (require_location), idempotent like 0002. Live effect: 465 -> 252 relevant candidates over 30 days (bay 169, seattle 32, toronto 29, nyc 22).",
