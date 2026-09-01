@@ -79,3 +79,45 @@ def test_greenhouse_remote_parse(registry, fixture_html):
     job = registry.resolve(page.final_url).parse(page)
     assert job.remote_status == "Remote"
     assert job.company == "Acme"
+
+
+# --- domains added from the "search ATS boards directly" list ------------- #
+@pytest.mark.parametrize(
+    "url,slug",
+    [
+        ("https://careers.icims.com/jobs/12345/swe-intern/job", "icims_careers"),
+        ("https://careers.workable.com/jobs/6789-software-engineer-intern", "workable_careers"),
+        ("https://apply.jazz.co/apply/abc123/software-engineer-intern", "jazzhr"),
+    ],
+)
+def test_additional_ats_domains_are_recognized(registry, url, slug):
+    assert registry.platform_slug_for(url) == slug
+
+
+@pytest.mark.parametrize(
+    "host",
+    ["careers.icims.com", "careers.workable.com", "apply.jazz.co"],
+)
+def test_additional_domains_are_on_the_ssrf_allowlist(host):
+    """Without this the expiration check cannot fetch their pages."""
+    from jobbot.parsing.ssrf import host_is_allowed
+
+    assert host_is_allowed(host)
+
+
+def test_new_slugs_inherit_the_right_priority_tier():
+    """Slug-base normalization must keep the *_careers variants in step with
+    their parent platform, or an iCIMS job would rank as neutral."""
+    from jobbot.scoring.platform_prefs import platform_factor
+
+    assert platform_factor("icims_careers") == platform_factor("icims")  # deprioritized
+    assert platform_factor("workable_careers") == platform_factor("workable")  # preferred
+    assert 0.0 < platform_factor("jazzhr") < 1.0  # neutral: no strong opinion yet
+
+
+def test_workable_adapter_does_not_claim_the_careers_domain(registry):
+    """careers.workable.com has a different URL shape; the Workable adapter's
+    company-from-URL would read 'Jobs' out of /jobs/1234-title."""
+    job_board = registry.resolve("https://careers.workable.com/jobs/1-x")
+    assert job_board.slug == "workable_careers"
+    assert job_board._company_from_url("https://careers.workable.com/jobs/1-x") is None
