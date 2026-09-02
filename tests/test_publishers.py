@@ -10,10 +10,14 @@ import pytest
 
 from jobbot.publishers.github_readme import GitHubReadmePublisher
 from jobbot.publishers.markdown import (
+    SECTION_BEGIN,
+    SECTION_END,
     content_hash,
     escape_cell,
     extract_content_hash,
+    merge_section,
     render_readme,
+    render_section,
     safe_url,
 )
 
@@ -266,3 +270,79 @@ def test_age_accepts_extracted_job_shape():
         posting_date: datetime | None = None
 
     assert "2d" in render_readme([Extracted(posting_date=NOW - timedelta(days=2))])
+
+
+# --- section markers: listing inside a hand-written README ---------------- #
+def _doc(inner: str = "placeholder") -> str:
+    return (
+        "# My Project\n\nIntro paragraph.\n\n## Openings\n\n"
+        f"{SECTION_BEGIN}\n{inner}\n{SECTION_END}\n\n---\n\n## Architecture\n\nDocs.\n"
+    )
+
+
+def test_merge_replaces_only_the_marked_region():
+    out = merge_section(_doc(), render_section([FakeJob()], title=None))
+    assert "# My Project" in out and "Intro paragraph." in out
+    assert "## Architecture" in out and "Docs." in out
+    assert "placeholder" not in out
+    assert "Acme" in out
+
+
+def test_merge_is_idempotent():
+    once = merge_section(_doc(), render_section([FakeJob()], title=None))
+    twice = merge_section(once, render_section([FakeJob()], title=None))
+    assert once.count(SECTION_BEGIN) == 1
+    assert twice.count(SECTION_BEGIN) == 1
+
+
+def test_merge_keeps_content_before_and_after_exactly():
+    out = merge_section(_doc(), render_section([FakeJob()], title=None))
+    before, after = out.split(SECTION_BEGIN)[0], out.split(SECTION_END)[1]
+    assert before == "# My Project\n\nIntro paragraph.\n\n## Openings\n\n"
+    assert after == "\n\n---\n\n## Architecture\n\nDocs.\n"
+
+
+def test_merge_without_markers_returns_the_standalone_document():
+    """A dedicated LISTINGS.md has no markers and is replaced wholesale."""
+    out = merge_section("# old file", render_section([FakeJob()]))
+    assert "old file" not in out
+    assert "Acme" in out
+
+
+def test_merge_refuses_to_mangle_out_of_order_markers():
+    broken = f"top\n{SECTION_END}\nmiddle\n{SECTION_BEGIN}\nbottom"
+    assert merge_section(broken, render_section([FakeJob()], title=None)) == broken
+
+
+def test_section_omits_the_heading_when_the_host_supplies_one():
+    section = render_section([FakeJob()], title=None)
+    assert not section.splitlines()[1].startswith("# ")
+
+
+def test_section_hash_marker_survives_for_change_detection():
+    out = merge_section(_doc(), render_section([FakeJob()], title=None))
+    assert extract_content_hash(out) == content_hash([FakeJob()])
+
+
+def test_explicit_empty_footer_is_honoured():
+    """`footer or default` would have ignored this and injected the footer."""
+    assert "Generated automatically" not in render_readme([FakeJob()], footer="")
+
+
+async def test_publisher_splices_into_an_existing_readme():
+    puts: list[dict] = []
+    existing = _doc()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "GET":
+            return _existing_response(existing)
+        puts.append(json.loads(request.content))
+        return httpx.Response(200, json={})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        pub = GitHubReadmePublisher(client, token="t", repo="o/n", path="README.md")
+        assert await pub.publish([FakeJob()]) is True
+
+    written = base64.b64decode(puts[0]["content"]).decode()
+    assert "## Architecture" in written, "publisher must not destroy the rest of the README"
+    assert "Acme" in written

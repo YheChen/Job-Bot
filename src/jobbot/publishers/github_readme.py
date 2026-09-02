@@ -25,7 +25,14 @@ from datetime import UTC, datetime
 import httpx
 
 from jobbot.logging import get_logger
-from jobbot.publishers.markdown import content_hash, extract_content_hash, render_readme
+from jobbot.publishers.markdown import (
+    SECTION_BEGIN,
+    content_hash,
+    extract_content_hash,
+    merge_section,
+    render_readme,
+    render_section,
+)
 
 log = get_logger(__name__)
 
@@ -111,7 +118,16 @@ class GitHubReadmePublisher:
             log.info("publish_unchanged", publisher=self.name, jobs=len(jobs))
             return False
 
-        body = render_readme(jobs, title=self._title, generated_at=datetime.now(UTC))
+        # If the target already contains the section markers, replace only that
+        # region and leave the rest of the document alone. This is what allows
+        # the listing to live inside a hand-written README instead of
+        # obliterating it — GitHub only renders a file named README, so the
+        # table has to go there to appear on the repo landing page.
+        now = datetime.now(UTC)
+        if existing and SECTION_BEGIN in existing:
+            body = merge_section(existing, render_section(jobs, title=None, generated_at=now))
+        else:
+            body = render_readme(jobs, title=self._title, generated_at=now)
         payload = {
             "message": f"{self._commit_message} ({len(jobs)} roles)",
             "content": base64.b64encode(body.encode()).decode(),
