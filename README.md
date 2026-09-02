@@ -1,5 +1,14 @@
 # jobbot — Software Engineering Internship Discovery Bot
 
+## 📋 Current openings
+
+<!-- jobbot:begin -->
+_The bot replaces everything between these markers on each scan. Nothing outside
+them is touched, so the rest of this README stays hand-written._
+<!-- jobbot:end -->
+
+---
+
 A production-ready Discord bot that regularly searches applicant tracking systems
 (Ashby, Greenhouse, Lever, Workday, SmartRecruiters, Workable, and more) via a
 configurable **search API**, extracts and de-duplicates postings, filters them
@@ -336,6 +345,19 @@ repo — it is a write credential.
 After each scan the bot renders the open, above-threshold jobs (newest first)
 and commits via the GitHub Contents API — no git binary, no clone, no
 credentials on disk.
+
+**Putting the listing on the repo landing page.** GitHub only renders a file
+named `README`, so point `GITHUB_PUBLISH_PATH` at `README.md` and add these
+markers wherever you want the table (this repo has them at the top):
+
+```markdown
+<!-- jobbot:begin -->
+<!-- jobbot:end -->
+```
+
+Only the region between the markers is replaced; everything else stays
+hand-written. Without markers the target file is replaced wholesale, which is
+the right behaviour for a dedicated `LISTINGS.md`.
 
 - **No commit churn.** The document embeds a content-hash marker covering the
   table rows but *not* the "last updated" line, so an unchanged listing costs

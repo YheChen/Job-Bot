@@ -1,7 +1,7 @@
 {
   "_purpose": "Durable session-handover context for the Job Bot project. Update this file when compacting chat history so a fresh session can resume without re-deriving decisions. Keep it factual and current; prune anything stale. Update 'last_updated' and append to 'changelog' on each edit.",
   "schema_version": "1.0",
-  "last_updated": "2026-08-21",
+  "last_updated": "2026-09-02",
   "project": {
     "name": "jobbot",
     "description": "Discord bot that discovers software-engineering internships via a configurable search API (Serper/Bing/Brave/Google PSE), extracts + de-duplicates + relevance-filters postings across major ATS platforms, and posts them to Discord as embeds with action buttons.",
@@ -30,7 +30,7 @@
   ],
   "current_state": {
     "branch": "master (clean)",
-    "tests": "246 passing (pytest)",
+    "tests": "255 passing (pytest)",
     "db_schema": "15 tables. 0001_initial uses metadata.create_all (NOT a frozen snapshot); 0002 adds the platform-priority columns and is idempotent-by-inspection to survive both fresh and existing databases.",
     "lint": "ruff clean; ruff format applied across codebase (ruff 0.15.21)",
     "deployment_status": "LIVE on the ThinkPad since 2026-08-08 (docker-compose.prod.yml). Scans run every 6h and the pipeline works; the post channel was unset until 2026-08-17, so ~684 jobs queued up unposted. Delivery is capped at 25/scan.",
@@ -49,14 +49,15 @@
       "#12 Fix /jobs set-locations crash + report command errors",
       "#13 Add scripts/purge_locations.py",
       "#14 Fix purge over-matching + add restore",
-      "#15 Add careers.icims.com, careers.workable.com, apply.jazz.co"
+      "#15 Add careers.icims.com, careers.workable.com, apply.jazz.co",
+      "#16 Publish listings into a README section"
     ]
   },
   "discovery_paths": {
     "search": "SearchProvider (Serper/Bing/Brave/Google PSE) over generated site: queries \u2014 consumes API quota.",
     "listing_sources": "jobbot/sources/ \u2014 curated feeds mapped straight to ExtractedJob, no page fetch, no search quota. SimplifyJobs listings.json enabled by default (ENABLE_GITHUB_LISTINGS), ETag-conditional so an unchanged 11 MB feed costs a 304. Live check 2026-08-04: 489 candidates in a 30-day window, 319 passing the 0.55 gate.",
     "shared_tail": "Both paths converge on ScanService._ingest (dedup -> score -> persist), then _post_pending (expiration -> poster).",
-    "publishing": "jobbot/publishers/ \u2014 optional mirror of the open listing to a GitHub repo README via the Contents API (ENABLE_GITHUB_PUBLISH, off by default). Change detection uses a content-hash marker embedded in the file that excludes the timestamp, so an unchanged listing makes no commit. All cell values are escaped because feed data is published publicly."
+    "publishing": "jobbot/publishers/ \u2014 optional mirror of the open listing to a GitHub repo README via the Contents API (ENABLE_GITHUB_PUBLISH, off by default). Change detection uses a content-hash marker embedded in the file that excludes the timestamp, so an unchanged listing makes no commit. All cell values are escaped because feed data is published publicly. As of PR #16 the publisher splices into a <!-- jobbot:begin/end --> region when present, so the listing can live at the TOP of a hand-written README (GitHub only renders a file named README); without markers the file is replaced wholesale, which suits a dedicated LISTINGS.md."
   },
   "conventions": {
     "ci": ".github/workflows/ci.yml runs on push/PR to master: ruff check, ruff format --check, pytest, and a SQLite alembic upgrade head smoke test.",
@@ -113,6 +114,7 @@
     "Consider a live-API integration test (skipped unless a key env var is set) to catch ATS HTML changes."
   ],
   "changelog": [
+    "2026-09-02 PR #16: listings can now live inside README.md. GitHub cannot be configured to render LISTINGS.md as the landing page \u2014 only a file named README (checked in .github/, root, docs/). So the publisher gained marker-delimited splicing: render_section() + merge_section() replace only the region between <!-- jobbot:begin --> and <!-- jobbot:end -->, leaving the rest of the document untouched. Markers added at the TOP of this repo's README. Also fixed `footer or default` in render_readme, which ignored an explicit \"\" and injected the footer into embedded sections.",
     "2026-08-21 PR #15: added 3 ATS domains (careers.icims.com -> icims_careers, careers.workable.com -> workable_careers, apply.jazz.co -> jazzhr). careers.workable.com is registered as a GENERIC adapter, not added to WorkableAdapter.domains, because its URL shape is /jobs/<id>-<slug> and WorkableAdapter._company_from_url would derive the company 'Jobs' from it. Slug-base normalization in platform_prefs keeps *_careers variants in the same tier as their parent. PLATFORMS drives the SSRF allowlist too, so the new hosts became fetchable automatically. MEASURED: the SimplifyJobs feed contains ZERO listings on all three (and zero on jobs.icims.com); only apply.workable.com appears (25 of 2655). So their value is search-path only and is UNVERIFIED \u2014 no Serper key available to test. Candidate query pool grew 570 -> 660 while max_queries_per_scan stayed 40, so per-platform rotation is slightly diluted (~16.5 scans for full coverage vs ~14).",
     "2026-08-20 PR #14: FIELD INCIDENT. purge_locations.py --apply closed 726 of 804 jobs including San Jose/SF/Palo Alto/Redmond, which should have been kept. Cause: _configured_locations did list(row.locations); list() on a STRING yields one entry per character, so every location resolved to a single char and matched nothing. match_location itself was correct. Fixes: (1) canonical_groups splits a bare string on commas instead of iterating it, strips quotes/brackets, and drops <2-char entries; (2) _configured_locations never list()s a str; (3) the script prints locations with repr AND the resolved groups, so a bad value is visible; (4) a safety valve REFUSES to purge >85% of active jobs without --force; (5) --restore reopens closed jobs that match. Recovery is possible because --apply marks jobs closed rather than deleting. PROCESS LESSON (second occurrence): an unasserted str.replace patch silently no-op'd again \u2014 always assert the target text exists before replacing.",
     "2026-08-20 PR #12: FIELD BUG. /jobs set-locations crashed with 'The application didn't respond'. PR #11 changed settings_service.set_locations to return (locations, require_location) but the matching edit to bot/cogs/jobs.py silently no-op'd (a str.replace whose target text no longer matched after formatting), so the cog still called the 1-arg form and did ', '.join(tuple). No test caught it because every existing test called the SERVICE directly and none exercised the cog. Fixed the cog, added cog_app_command_error so handler exceptions are reported in Discord instead of a silent timeout, and added tests/test_cog_commands.py (verified to fail against the broken cog). LESSON: verify string-replacement patches actually applied \u2014 assert the target exists before replacing.",

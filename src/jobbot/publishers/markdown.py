@@ -20,6 +20,13 @@ from datetime import UTC, datetime
 
 # Marker used to detect whether the *content* changed, independent of the
 # "last updated" line — otherwise every run would produce a commit.
+# When these markers are present in the target file, only the region between
+# them is replaced. That lets the listing live inside a hand-written README
+# (GitHub only renders a file named README, so the table has to go there) while
+# leaving every other line under human control.
+SECTION_BEGIN = "<!-- jobbot:begin -->"
+SECTION_END = "<!-- jobbot:end -->"
+
 _HASH_MARKER = "<!-- jobbot:content-hash="
 _HASH_RE = re.compile(re.escape(_HASH_MARKER) + r"([0-9a-f]{8,64})\s*-->")
 
@@ -131,9 +138,39 @@ def render_readme(
             *(_row(job) for job in jobs),
         ]
 
-    lines += [
-        "",
-        footer or "_Generated automatically by [jobbot](https://github.com/YheChen/Job-Bot)._",
-        "",
-    ]
+    # `footer or default` would ignore an explicit "" — a caller embedding this
+    # table inside a larger document needs a way to suppress the footer.
+    if footer is None:
+        footer = "_Generated automatically by [jobbot](https://github.com/YheChen/Job-Bot)._"
+    lines += ["", footer, ""] if footer else [""]
     return "\n".join(lines)
+
+
+def render_section(
+    jobs: Sequence,
+    *,
+    title: str | None = "Software Engineering Internships",
+    generated_at: datetime | None = None,
+) -> str:
+    """Render just the managed block, wrapped in the section markers."""
+    body = render_readme(jobs, title=title or "", generated_at=generated_at, footer="")
+    if not title:
+        # Drop the leading "# " heading when the host document supplies its own.
+        body = "\n".join(body.splitlines()[2:])
+    return f"{SECTION_BEGIN}\n{body.strip()}\n{SECTION_END}"
+
+
+def merge_section(existing: str | None, section: str) -> str:
+    """Splice `section` into `existing` between the markers.
+
+    Falls back to returning the section alone when the target has no markers,
+    which is the standalone-file case (e.g. a dedicated LISTINGS.md).
+    """
+    if not existing or SECTION_BEGIN not in existing or SECTION_END not in existing:
+        return section
+
+    start = existing.index(SECTION_BEGIN)
+    end = existing.index(SECTION_END) + len(SECTION_END)
+    if end <= start:  # markers out of order; refuse to mangle the file
+        return existing
+    return existing[:start] + section + existing[end:]
