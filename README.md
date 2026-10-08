@@ -5,8 +5,8 @@ hours. Every row links straight to the company's own application page — no
 aggregators, no logins.
 
 <!-- jobbot:begin -->
-<!-- jobbot:content-hash=d5b8b5062067cb75 -->
-_200 open roles · last updated 2026-10-08 11:05 UTC_
+<!-- jobbot:content-hash=1df744c6c676b1fd -->
+_200 open roles · last updated 2026-10-08 17:05 UTC_
 
 | Company | Role | Location | Term | Application | Age |
 | --- | --- | --- | --- | --- | --- |
@@ -94,9 +94,9 @@ _200 open roles · last updated 2026-10-08 11:05 UTC_
 | Alexion | Development Operations AI & Automation Enablement Co-op Intern | Mississauga, ON, Canada | Winter 2027 | [Apply](<https://astrazeneca.wd3.myworkdayjobs.com/alexion/job/Canada---Mississauga/Co-Op--Development-Operations-AI---Automation-Enablement-Intern_R-260415>) | 9d |
 | Altera | Software Engineer Intern | Toronto, ON, Canada | Winter 2026 | [Apply](<https://altera.wd1.myworkdayjobs.com/altera/job/Toronto-Ontario-Canada/Software-Engineer----Intern_R03252>) | 9d |
 | Marvell | AI-Native Development Platform Engineer Intern | Santa Clara, CA | Summer 2027 | [Apply](<https://marvell.wd1.myworkdayjobs.com/MarvellCareers/job/Santa-Clara-CA/AI-Native-Development-Platform-Engineer-Intern--MS---Summer-2027_2603848-1>) | 9d |
-| Perchwell | Data Analytics Engineering Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/Perchwell/9d34fc9d-e235-44fc-bdf9-42e75223839a/application?embed=true>) | 8d |
-| Perchwell | Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/Perchwell/194eec78-26db-4d8e-850f-a99ea2733e9f/application?embed=true>) | 8d |
-| Plot Technologies | Applied AI Co-op | NYC | Winter 2026 | [Apply](<https://jobs.ashbyhq.com/plot/5f8cfeaa-c368-480f-aaa5-de52452a63d0/application?embed=true>) | 8d |
+| Perchwell | Data Analytics Engineering Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/Perchwell/9d34fc9d-e235-44fc-bdf9-42e75223839a/application?embed=true>) | 9d |
+| Perchwell | Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/Perchwell/194eec78-26db-4d8e-850f-a99ea2733e9f/application?embed=true>) | 9d |
+| Plot Technologies | Applied AI Co-op | NYC | Winter 2026 | [Apply](<https://jobs.ashbyhq.com/plot/5f8cfeaa-c368-480f-aaa5-de52452a63d0/application?embed=true>) | 9d |
 | Foresters Financial | Software Engineer Co-op Student | Toronto, ON, Canada | Winter 2026 | [Apply](<https://foresters.wd3.myworkdayjobs.com/ForestersFinancialCareers/job/Toronto/Software-Engineer-Co-op-Student--4-months-contract-_R-2329>) | 9d |
 | Rhoda AI | Robot Software Engineer Intern | Mountain View, CA | Winter 2026 | [Apply](<https://jobs.ashbyhq.com/rhoda-ai/9a57c8ff-dd2b-4547-a46a-44658a699ba5/application?embed=true>) | 9d |
 | Flint | Engineering Intern - Summer 2027 | SF | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/flint/39f9e665-7037-4dff-b77a-ff7039df2bfc/application?embed=true>) | 12d |
@@ -132,7 +132,7 @@ _200 open roles · last updated 2026-10-08 11:05 UTC_
 | Qumulo | Software Development Engineer Intern | Seattle, WA | Winter 2027 | [Apply](<https://jobs.ashbyhq.com/qumulo/43855947-3a85-4d1c-8b8e-e0c0ddcaf183/application?embed=true>) | 14d |
 | SeatGeek | Software Engineer Intern | NYC | Summer 2028 | [Apply](<https://seatgeek.com/jobs/8227553>) | 14d |
 | Figma | Data Engineer Intern | SF; NYC | Winter 2026 | [Apply](<https://boards.greenhouse.io/figma/jobs/6178851004>) | 14d |
-| Bedrock Robotics | Evaluation Engineer Intern - Metric Prototyping | SF | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/bedrock-robotics/07b55743-d5c4-4347-bfac-000821317b13/application?embed=true>) | 14d |
+| Bedrock Robotics | Evaluation Engineer Intern - Metric Prototyping | SF | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/bedrock-robotics/07b55743-d5c4-4347-bfac-000821317b13/application?embed=true>) | 15d |
 | G2 | AI Agent Evaluations Intern | SF | Fall 2026 | [Apply](<https://jobs.ashbyhq.com/G2/64dcc04a-a0e7-493b-b899-dd4c56e561fd/application?embed=true>) | 16d |
 | KLA | Algorithm Engineering Intern | Milpitas, CA | Winter 2026 | [Apply](<https://kla.wd1.myworkdayjobs.com/UR/job/Milpitas-CA/Algorithm-Engineering-Intern--AI--Computer-Vision---Software-Engineering-_2641392-1>) | 16d |
 | Astranis | Software Engineer Enterprise Systems Intern - Summer 2027 | SF | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/astranis/jobs/4705610006>) | 15d |
@@ -155,9 +155,9 @@ _200 open roles · last updated 2026-10-08 11:05 UTC_
 | Rodan Energy Solutions | Data Operations Engineer AI Co-op - Winter 2027 | Mississauga, ON, Canada | Winter 2027 | [Apply](<https://rodanenergysolutionsinc.applytojob.com/apply/baC6tVrSpB/Data-Operations-Engineer-AI-Coop-Student-Winter-2027>) | 16d |
 | AMD | AI Research Intern - Reinforcement Learning and LLM Post-Training | Santa Clara, CA | Summer 2027 | [Apply](<https://careers.amd.com/jobs/91013?icims=1>) | 16d |
 | Atlassian | Machine Learning Intern | Seattle, WA; SF | Summer 2027 | [Apply](<https://campus-americas.icims.com/jobs/26268/machine-learning-intern%2c-2027-summer-u.s./job>) | 16d |
-| Lazard | Data Engineer Intern | NYC | Summer 2027 | [Apply](<https://icbpjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/LazardProfessionalCareers/job/6605>) | 16d |
-| Lazard | AI Engineer Intern | NYC | Summer 2027 | [Apply](<https://icbpjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/LazardProfessionalCareers/job/6606>) | 16d |
-| Collinear AI | Research Scientist Intern - Applied Scientist | SF; India; Bengaluru, Karnataka, India (+2 more) | Winter 2026 | [Apply](<https://jobs.ashbyhq.com/collinear-ai/ae85fd08-dfd8-42e5-9b3b-9921ba24742b/application?embed=true>) | 16d |
+| Lazard | Data Engineer Intern | NYC | Summer 2027 | [Apply](<https://icbpjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/LazardProfessionalCareers/job/6605>) | 17d |
+| Lazard | AI Engineer Intern | NYC | Summer 2027 | [Apply](<https://icbpjb.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/LazardProfessionalCareers/job/6606>) | 17d |
+| Collinear AI | Research Scientist Intern - Applied Scientist | SF; India; Bengaluru, Karnataka, India (+2 more) | Winter 2026 | [Apply](<https://jobs.ashbyhq.com/collinear-ai/ae85fd08-dfd8-42e5-9b3b-9921ba24742b/application?embed=true>) | 17d |
 | Mercury | Software Engineering Intern - Spring 2027 | SF; Remote in USA; NYC (+2 more) | Spring 2027 | [Apply](<https://job-boards.greenhouse.io/mercury/jobs/6199367004>) | 17d |
 | Achievers | Software Engineer Co-op - Winter 2027 | Toronto, ON, Canada | Winter 2027 | [Apply](<https://jobs.lever.co/achievers/e0700fce-b33b-435a-ab90-84bbd677e181/apply>) | 19d |
 | Together AI | Systems Research Engineer Intern - GPU Programming | SF | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/togetherai/jobs/5238460007>) | 19d |
@@ -184,9 +184,9 @@ _200 open roles · last updated 2026-10-08 11:05 UTC_
 | Decagon | Engineering Intern | SF | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/decagon/16529089-a048-4bc3-8456-3f197135e00b/application?embed=true>) | 21d |
 | Persona | Software Engineer Intern | SF | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/persona/eb77c97c-fa9d-4bf0-9566-e5ba4453b7d3/application?embed=true>) | 21d |
 | Clockwork Systems | Software Engineer Intern | Palo Alto, CA | Winter 2026 | [Apply](<https://job-boards.greenhouse.io/clockworksystems/jobs/6174230004>) | 21d |
-| Gecko Robotics | Full Stack Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/gecko-robotics/01138338-ff3c-4982-8ba3-5401386bf082/application?embed=true>) | 21d |
-| Gecko Robotics | AI/Machine Learning Engineer Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/gecko-robotics/c097505b-0a28-4a33-a917-268f463641e8/application?embed=true>) | 21d |
-| Bedrock Robotics | Software Engineer Intern - Fleet Platform | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/bedrock-robotics/8927dd7e-a48d-49a2-92eb-09ec059432f4/application?embed=true>) | 21d |
+| Gecko Robotics | Full Stack Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/gecko-robotics/01138338-ff3c-4982-8ba3-5401386bf082/application?embed=true>) | 22d |
+| Gecko Robotics | AI/Machine Learning Engineer Intern | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/gecko-robotics/c097505b-0a28-4a33-a917-268f463641e8/application?embed=true>) | 22d |
+| Bedrock Robotics | Software Engineer Intern - Fleet Platform | NYC | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/bedrock-robotics/8927dd7e-a48d-49a2-92eb-09ec059432f4/application?embed=true>) | 22d |
 | Johnson & Johnson | Software Engineer Intern - Robotics R&D | Santa Clara, CA | Summer 2027 | [Apply](<https://jj.wd5.myworkdayjobs.com/JJ/job/Santa-Clara-California-United-States-of-America/Software-Engineering-Intern---Robotics-R-D_R-099919>) | 23d |
 | Duolingo | Software Engineer Intern | Seattle, WA; Pittsburgh, PA; NYC | Summer 2027 | [Apply](<https://careers.duolingo.com/jobs/8805925002>) | 22d |
 | NVIDIA | Generative AI Research Intern - Fundamental Generative AI | Santa Clara, CA | Winter 2026 | [Apply](<https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/US-CA-Santa-Clara/Research-Intern--Fundamental-Generative-AI---2027_JR2025406>) | 23d |
