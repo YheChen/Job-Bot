@@ -5,8 +5,8 @@ hours. Every row links straight to the company's own application page — no
 aggregators, no logins.
 
 <!-- jobbot:begin -->
-<!-- jobbot:content-hash=0ed6a049347542f5 -->
-_200 open roles · last updated 2026-11-01 11:05 UTC_
+<!-- jobbot:content-hash=8c1ad292a50d77e5 -->
+_200 open roles · last updated 2026-11-01 17:05 UTC_
 
 | Company | Role | Location | Term | Application | Age |
 | --- | --- | --- | --- | --- | --- |
@@ -38,9 +38,9 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | HP Inc. | Software Quality Assurance Intern | SF | Summer 2027 | [Apply](<https://hp.wd5.myworkdayjobs.com/EXTEU-AC-CareerSite/job/San-Francisco-California-United-States-of-America/Software-Quality-Assurance-Intern_UNI4802>) | 4d |
 | HP Inc. | Software Systems Intern - IQ | SF | Summer 2027 | [Apply](<https://hp.wd5.myworkdayjobs.com/EXTEU-AC-CareerSite/job/San-Francisco-California-United-States-of-America/Software-Systems-Intern_UNI4801>) | 4d |
 | Schonfeld | AI Enablement Intern | NYC | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/schonfeld/jobs/8171694>) | 3d |
-| AMD | Masters AI Training Software & Performance Co-op | San Jose, CA | Spring 2027 | [Apply](<https://careers.amd.com/jobs/93476?icims=1>) | 3d |
-| Intuitive Surgical | Robotics Engineer Intern | Sunnyvale, CA | Summer 2027 | [Apply](<https://jobs.smartrecruiters.com/Intuitive/744000158313717>) | 3d |
-| Intuitive Surgical | Manufacturing Software Engineer Intern | Sunnyvale, CA | Summer 2026 | [Apply](<https://jobs.smartrecruiters.com/Intuitive/744000158313919>) | 3d |
+| AMD | Masters AI Training Software & Performance Co-op | San Jose, CA | Spring 2027 | [Apply](<https://careers.amd.com/jobs/93476?icims=1>) | 4d |
+| Intuitive Surgical | Robotics Engineer Intern | Sunnyvale, CA | Summer 2027 | [Apply](<https://jobs.smartrecruiters.com/Intuitive/744000158313717>) | 4d |
+| Intuitive Surgical | Manufacturing Software Engineer Intern | Sunnyvale, CA | Summer 2026 | [Apply](<https://jobs.smartrecruiters.com/Intuitive/744000158313919>) | 4d |
 | ABB | AI Robotics Intern | San Jose, CA | Fall 2026 | [Apply](<https://abb.wd3.myworkdayjobs.com/external_career_page/job/Milpitas-California-USA/AI-Robotics-Intern--Fall-2026_JR00044846>) | 4d |
 | Qualcomm | Deep Learning Research Intern - Interim Engineering Intern - Systems | Markham, ON, Canada | Summer 2027 | [Apply](<https://qualcomm.eightfold.ai/careers/job/446721828828>) | 3d |
 | The Robotics Company | Engineer Intern | SF; Zürich, Switzerland | — | [Apply](<https://jobs.ashbyhq.com/the-robotics-company/a85ed44f-f321-42fb-ad09-f67f930e6cde/application?embed=true>) | 26d |
@@ -66,7 +66,7 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | Amazon | Database Engineer Intern | Seattle, WA; East Palo Alto, CA | Summer 2027 | [Apply](<https://amazon.jobs/en/jobs/10590290/database-engineer-intern-summer-2027>) | 4d |
 | Micron Technology | AI & Product Management Intern - Mobile Memory - Lpdram | San Jose, CA | — | [Apply](<https://micron.wd1.myworkdayjobs.com/External/job/San-Jose-CA/Intern---AI---Product-Management--Mobile-Memory--LPDRAM-_JR115839>) | 5d |
 | JP Morgan Chase | Machine Learning Center of Excellence Summer Associate Intern - Time Series and Reinforcement Learning - Tsrl | NYC | Summer 2027 | [Apply](<https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/210803983>) | 4d |
-| Atoms | AI Research Intern | SF; Mountain View, CA | — | [Apply](<https://job-boards.greenhouse.io/cssmerge/jobs/8919606002>) | 4d |
+| Atoms | AI Research Intern | SF; Mountain View, CA | — | [Apply](<https://job-boards.greenhouse.io/cssmerge/jobs/8919606002>) | 5d |
 | ASML | Imaging Product Engineer Intern | San Jose, CA | — | [Apply](<https://asml.wd3.myworkdayjobs.com/asmlext1/job/San-Jose-CA-USA/Internship--Imaging-product-engineer_J-00355220>) | 5d |
 | ASML | Frontend Developer Intern | San Jose, CA | — | [Apply](<https://asml.wd3.myworkdayjobs.com/asmlext1/job/San-Jose-CA-USA/Internship---Frontend-Developer_J-00354852>) | 5d |
 | Visa | Data Science Intern - Data and AI Team | Foster City, CA | Summer 2027 | [Apply](<https://visa.wd5.myworkdayjobs.com/Visa/job/US---Foster-City-CA/Data-Science-Intern--Data-and-AI-Team---Summer-2027_REF089883W-1>) | 5d |
@@ -77,7 +77,7 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | onsemi | AI & Data Science Intern | San Jose, CA | Summer 2027 | [Apply](<https://hctz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/2506468>) | 5d |
 | CIBC | AI Scientist Co-op | Toronto, ON, Canada | — | [Apply](<https://cibc.wd3.myworkdayjobs.com/campus/job/Toronto-ON/AI-Scientist-Co-op_2622058>) | 6d |
 | Royal Bank of Canada | Developer Intern | Toronto, ON, Canada | Summer 2027 | [Apply](<https://rbc.wd3.myworkdayjobs.com/RBCEARLYTALENT1/job/TORONTO-Ontario-Canada/Developer--RBC-Amplify-2027--Toronto_R-0000191193-1>) | 6d |
-| Meta | Research Intern - Embedded AI on Wearables - PhD | Redmond, WA | — | [Apply](<https://www.metacareers.com/jobs/4070678619908522>) | 5d |
+| Meta | Research Intern - Embedded AI on Wearables - PhD | Redmond, WA | — | [Apply](<https://www.metacareers.com/jobs/4070678619908522>) | 6d |
 | Vigil Labs | Software Engineer Intern | Palo Alto, CA | — | [Apply](<https://simplify.jobs/p/4712ce89-b48c-4c1c-9db2-5b03917f8bb2>) | 6d |
 | Hewlett Packard Enterprise | AI/ML Developer Intern | San Jose, CA | — | [Apply](<https://hpe.wd5.myworkdayjobs.com/jobsathpe/job/San-Jose-California/AI-ML-Developer-Intern_1217413>) | 7d |
 | Skydio | PhD Autonomy Engineer Intern | San Mateo, CA | — | [Apply](<https://jobs.ashbyhq.com/skydio/fe26fdf8-15b2-44e6-8e43-ace13431453c/application?embed=true>) | 7d |
@@ -87,8 +87,8 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | Boson Ai | MScAC Intern | Toronto, ON, Canada | Summer 2027 | [Apply](<https://jobs.lever.co/bosonai/3b66f322-55eb-4c4b-9b36-028dfcdd85e9/apply>) | 8d |
 | Simbe Robotics | Computer Vision / Applied AI Intern | Burlingame, CA | Summer 2027 | [Apply](<https://jobs.lever.co/SimbeRobotics/d8e862ca-212d-4a88-af74-de400b0c6bf8/apply>) | 8d |
 | Amperesand | AI/ML Engineer Intern | Sunnyvale, CA | — | [Apply](<https://job-boards.greenhouse.io/amperesand/jobs/4465899009>) | 8d |
-| Robert Bosch Venture Capital | Agentic AI Intern | Sunnyvale, CA | — | [Apply](<https://jobs.smartrecruiters.com/BoschGroup/744000157483412>) | 8d |
-| MongoDB | Software Engineer Intern | Palo Alto, CA; Seattle, WA; SF (+2 more) | Summer 2027 | [Apply](<https://www.mongodb.com/careers/job>) | 8d |
+| Robert Bosch Venture Capital | Agentic AI Intern | Sunnyvale, CA | — | [Apply](<https://jobs.smartrecruiters.com/BoschGroup/744000157483412>) | 9d |
+| MongoDB | Software Engineer Intern | Palo Alto, CA; Seattle, WA; SF (+2 more) | Summer 2027 | [Apply](<https://www.mongodb.com/careers/job>) | 9d |
 | Adobe | AI & Architecture Intern | San Jose, CA | Summer 2027 | [Apply](<https://adobe.wd5.myworkdayjobs.com/external_experienced/job/San-Jose/XMLNAME-2027-Intern---AI---Architecture_R172998>) | 13d |
 | onsemi | AI & Data Engineering Intern | San Jose, CA | Spring 2027 | [Apply](<https://hctz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/2506526>) | 33d |
 | Amazon | Applied Scientist Intern - Pxt Legends | Palo Alto, CA; Boston, MA; Seattle, WA (+5 more) | Summer 2027 | [Apply](<https://amazon.jobs/en/jobs/10564597/2027-applied-science-internship-reinforcement-learning-optimization-machine-learning-united-states-phd-student-science-recruiting>) | 9d |
@@ -134,7 +134,7 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | Skydio | Wireless Hardware Engineer Intern | San Mateo, CA | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/skydio/1ac972b1-8094-4765-8869-63e1c4d50dea/application?embed=true>) | 11d |
 | Skydio | Mobile Software Engineer Intern | San Mateo, CA | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/skydio/8a237302-3fe8-4403-b32b-7690f333ba52/application?embed=true>) | 11d |
 | Intel | Data Science / Software Engineering PhD Intern | Santa Clara, CA | Summer 2027 | [Apply](<https://intel.wd1.myworkdayjobs.com/en-us/external/job/US-California-Santa-Clara/AI-Data-Science---Software-Engineering-PhD-Intern-New-2027_JR0288138>) | 12d |
-| Steel | Software Engineer Intern | Toronto, ON, Canada | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/steel/5fbdbebf-ddb2-4264-a941-3ab6d475208c/application?embed=true>) | 11d |
+| Steel | Software Engineer Intern | Toronto, ON, Canada | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/steel/5fbdbebf-ddb2-4264-a941-3ab6d475208c/application?embed=true>) | 12d |
 | Microsoft | Data Science – Forward Deployed Engineer: PhD Intern | Redmond, WA | — | [Apply](<https://apply.careers.microsoft.com/careers/job/1970393557040991>) | 12d |
 | JP Morgan Chase | Machine Learning Summer Associate Intern - NLP | Palo Alto, CA; Seattle, WA; NYC | Summer 2027 | [Apply](<https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/job/210801790>) | 12d |
 | CIBC | Application Developer Co-op - Enterprise Technology & Business Management | Toronto, ON, Canada | Winter 2027 | [Apply](<https://cibc.wd3.myworkdayjobs.com/search/job/Toronto-ON/Application-Software-Developer-Co-op--Winter-2027---Enterprise-Technology---Business-Management_2621524>) | 13d |
@@ -178,7 +178,7 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | Skydio | Software Engineer Intern | San Mateo, CA | Summer 2027 | [Apply](<https://jobs.ashbyhq.com/skydio/79fdda46-4ff5-42c7-b208-55f2084cdb8c/application?embed=true>) | 17d |
 | Hitachi | Research Intern - Knowledge Engineering & Generative AI | Santa Clara, CA | Winter 2027 | [Apply](<https://hitachi.wd1.myworkdayjobs.com/hitachi/job/Santa-Clara-California-United-States/Research-Intern--Knowledge-Engineering---Generative-AI_R0148396>) | 18d |
 | LSEG | Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://lseg.wd3.myworkdayjobs.com/Graduate_Careers/job/New-York-City-United-States/Intern---Software-Engineer_R0124266-1>) | 18d |
-| Point72 | Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://boards.greenhouse.io/point72/jobs/8885733002>) | 17d |
+| Point72 | Software Engineer Intern | NYC | Summer 2027 | [Apply](<https://boards.greenhouse.io/point72/jobs/8885733002>) | 18d |
 | GE Vernova | AI Evaluation & Benchmarking Intern - AGI | Bellevue, WA | Summer 2027 | [Apply](<https://gevernova.wd5.myworkdayjobs.com/only_confidential_executive_recruiting/job/Bellevue/GE-Vernova---AGI---AI-Evaluation---Benchmarking-Intern---Summer-2027_R5054821-1>) | 18d |
 | GE Vernova | AI Post-Training and Model Alignment Intern | Bellevue, WA | Summer 2027 | [Apply](<https://gevernova.wd5.myworkdayjobs.com/only_confidential_executive_recruiting/job/Bellevue/GE-Vernova---AGI---AI-Post-Training-and-Model-Alignment-Intern---Summer-2027_R5054822-1>) | 18d |
 | SPS Commerce | Software Engineer Intern | Brampton, ON, Canada | — | [Apply](<https://spscommerce.wd108.myworkdayjobs.com/SPS/job/CA-ON-Brampton-Office/Software-Engineer-Intern_R-001352>) | 18d |
@@ -205,7 +205,7 @@ _200 open roles · last updated 2026-11-01 11:05 UTC_
 | MEMX | Data Engineer Intern | NYC | Summer 2027 | [Apply](<https://job-boards.greenhouse.io/memx/jobs/5450442008>) | 19d |
 | General Motors | AI/Machine Learning Intern - Research and Development | Mountain View, CA | Summer 2027 | [Apply](<https://generalmotors.wd5.myworkdayjobs.com/Careers_GM/job/Mountain-View-California-United-States-of-America/XMLNAME-2027-Summer-Intern---Research-and-Development---AI-Machine-Learning_JR-202621620>) | 20d |
 | KLA | Algorithm Engineer Intern - GPU/CUDA | Milpitas, CA | — | [Apply](<https://kla.wd1.myworkdayjobs.com/UR/job/Milpitas-CA/Algorithm-Engineering-Intern--GPU-CUDA-_2642044-2>) | 20d |
-| Google | Forward Deployed Engineer Intern | NYC; Sunnyvale, CA | Summer 2027 | [Apply](<https://www.google.com/about/careers/applications/jobs/results/75665705386549958>) | 19d |
+| Google | Forward Deployed Engineer Intern | NYC; Sunnyvale, CA | Summer 2027 | [Apply](<https://www.google.com/about/careers/applications/jobs/results/75665705386549958>) | 20d |
 | Resource Innovations | Energy Engineering Intern | Toronto, ON, Canada | Winter 2027 | [Apply](<https://apply.workable.com/resource-innovations/j/4CAAA40639/apply>) | 20d |
 | Mercor | Software Engineer Intern | SF | — | [Apply](<https://jobs.ashbyhq.com/mercor/de3025e5-10ca-4d55-b688-eff0e647ac8d/application?embed=true>) | 45d |
 | Workday | Machine Learning Engineer Intern | Toronto, ON, Canada; Vancouver, BC, Canada | Winter 2027 | [Apply](<https://workday.wd5.myworkdayjobs.com/Workday_Early_Career/job/Canada-BC-Vancouver/Machine-Learning-Engineer-Intern_JR-0110806>) | 23d |
